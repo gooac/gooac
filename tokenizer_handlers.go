@@ -181,7 +181,7 @@ func (self *Tokenizer) HandleIdent(ch byte) error {
 	
 	if iskw {
 		nt.toktype = TokenKeyword
-		nt.tokenspecific = keywordTypes[id]
+		nt.keywordtype = keywordTypes[id]
 	}
 
 	self.tokens = append(self.tokens, nt)

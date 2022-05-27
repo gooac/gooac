@@ -120,10 +120,10 @@ var tokenNames = map[TokenType]string {
 type Token struct {
 	toktype 		TokenType
 	value 			string
-
 	position 		TokenizerPosition
 
-	tokenspecific 	interface{}
+	tokenspecific 	interface{}	
+	keywordtype 	KeywordType
 }
 
 func (t *Token) Print() {

@@ -14,7 +14,13 @@ func Test51Dir(t *testing.T) {
 	tok := Tokenizer{}
 	parser := Parser{}
 
-	dir, _ := parsetest_lua.ReadDir("tests/5.1")
+	dir, err := parsetest_lua.ReadDir("tests/5.1")
+
+	if err != nil {
+		t.Error("Please download the 5.1 tarball from https://www.lua.org/tests/index.html and place its all the .lua files in the root in tests/5.1/")
+		
+		return
+	}
 
 	for _, v := range dir {
 		println("\n -- TOKENIZING " + v.Name() + " -- ")

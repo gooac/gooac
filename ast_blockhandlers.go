@@ -137,6 +137,7 @@ func (self *Parser) HandleArgList() *ASTNode {
 		p = self.Peek()
 	
 		if p.token == TokenComma {
+			self.Consume()
 			continue
 		} else {
 			break

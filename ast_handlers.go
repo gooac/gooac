@@ -373,7 +373,36 @@ func (self *Parser) HandleIdentifier(t Token) *ASTNode {
 	return node
 }
 
-func (self *Parser) HandleComment(t Token) {// implement some sort of comment-doc system
+func (self *Parser) HandleComment(t Token) {
+	if self.ast.last != nil && self.ast.last.nodetype == NodeComment && t.newline > 1 {
+		new := []Token{}
+
+		new = append(new, self.ast.last.values["comments"].tokens...)
+		new = append(new, t)
+		
+		*self.ast.last = ASTNode{
+			nodetype: NodeComment,
+			values: map[string]ASTValue{
+				"comments":{
+					tokens: new,
+				},
+			},
+		}
+		return
+	}
+
+	n := &ASTNode{
+		nodetype: NodeComment,
+		values: map[string]ASTValue{
+			"comments":{
+				tokens: []Token{
+					t,
+				},
+			},
+		},
+	}
+
+	self.ast.Add(n)
 }
 
 func (self *Parser) HandleCall() []*ASTNode {
@@ -417,9 +446,7 @@ func (self *Parser) HandleCall() []*ASTNode {
 }
 
 func (self *Parser) HandleLParen(n ASTNode) {
-	println("HANDLELPAREN CALLED")
-
-	self.Consume() // consume (
+	self.Consume()
 		
 	args := self.HandleCall()
 
@@ -528,7 +555,6 @@ func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 	}
 
 	self.HandleIndexingNode(self.HandleBinExpr(&node))
-
 
 	assign := &ASTNode{
 		nodetype: NodeVariableAssignment,

@@ -13,5 +13,4 @@ var (
 	TokErrUnfinishedMLString 		TokenizationError = "Expected \"%v\", got <EOF>"
 
 	TokErrUnknownSymbol 			TokenizationError = "Unexpected Symbol '%v'"
-
 )

@@ -6,7 +6,8 @@ type NodeType string
 const (
 	NodeInvalid 				NodeType = "<!!  INVALID NODE  !!>"
 	NodeProgram 				NodeType = "ProgramRoot"
-	
+	NodeComment 				NodeType = "Comment"
+
 	NodeBool					NodeType = "Boolean"
 	NodeNil						NodeType = "NilValue"
 	NodeLiteral 				NodeType = "Literal"

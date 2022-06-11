@@ -245,6 +245,7 @@ type Token struct {
 	endpos		Position				// Copy of tokenizers ending position
 	
 	wspace		int						// Whitespace preceding token
+	newline 	int 					// Newlines after token
 
 	kwtype 		KeywordType				// Type of keyword if a keyword at all	
 }
@@ -256,6 +257,17 @@ func (self *Token) ToASTValue() ASTValue {
 }
 
 func (self *Token) Print() {
+	// fmt.Printf("tok(%v: ", tokenNames[self.token])
+	// print("[")
+	// for k, v := range []byte(self.value) {
+	// 	print(v)
+		
+	// 	if k != len(self.value) - 1 {
+	// 		print(", ")
+	// 	}
+	// }
+	// print("] = ")
+
 	fmt.Printf("<Token|%s-%s| is '%s' = \"%s\">", self.position.Fancy(), self.endpos.Fancy(), tokenNames[self.token], self.value)
 }
 

@@ -62,11 +62,12 @@ func TestParser(t *testing.T) {
 		return
 	}
 
+	// println("LEN: ", len(toks))
 	// for _, v := range toks {
 	// 	println()
 	// 	v.Print()
 	// }
-	println()
+	// println()
 	
 	ast, stop := parser.Parse(toks, &tok.err)
 

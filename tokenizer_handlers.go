@@ -410,7 +410,7 @@ func (self *Tokenizer) HandleComment(ch byte, ws int) {
 		_, np := self.PeekSome(amt + 1)
 
 		if np == '[' {
-			self.ConsumeAmount(2 + amt)
+			self.ConsumeAmount(1 + amt)
 			self.HandleMultilineComment(&start, amt)
 			return
 		}
@@ -421,7 +421,7 @@ func (self *Tokenizer) HandleComment(ch byte, ws int) {
 	for {
 		err, p := self.Peek()
 
-		if (err != nil) || (p == '\n') {
+		if (err != nil) || (p == '\n') || (p == '\r') {
 			break
 		}
 	
@@ -455,11 +455,12 @@ func (self *Tokenizer) HandleCStyleComment(ch byte, ws int) {
 
 	cmt := ""
 
+	self.Consume()
 	if nextp == '/' {
 		for {
 			err, p := self.Peek()
 
-			if (err != nil) || (p == '\n') {
+			if (err != nil) || (p == '\n') || (p == '\r') {
 				break
 			}
 		
@@ -503,6 +504,10 @@ func (self *Tokenizer) HandleMultilineComment(start *Position, eqamt int) {
 
 		if err != nil {
 			break
+		}
+
+		if p == '\r' {
+			continue
 		}
 
 		if p == ']' {

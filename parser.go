@@ -58,8 +58,7 @@ func (self *Parser) Peek() Token {
 	tok := self.tokens[self.index]
 
 	if tok.token == TokenComment {
-		self.HandleComment(self.Consume())
-
+		self.Consume()
 		return self.Peek()
 	}
 
@@ -175,7 +174,7 @@ func (self *Parser) HandleParsing() (bool, KeywordType) {
 		return true, KeywordEmpty
 	}
 	
-	curtok := self.Peek()	
+	curtok := self.PeekSome(0)	
 	
 	if curtok.token == TokenEOF {
 		return true, KeywordEmpty
@@ -214,6 +213,9 @@ func (self *Parser) HandleParsing() (bool, KeywordType) {
 
 	case TokenSemiColon:
 		self.Consume()
+
+	case TokenComment:
+		self.HandleComment(self.Consume())
 
 	default:
 		self.err.Error(ErrorFatal, ParserErrorUnexpectedX, tokenNames[curtok.token])

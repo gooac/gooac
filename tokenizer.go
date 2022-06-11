@@ -15,6 +15,7 @@ type Tokenizer struct {
 	err 		ErrorHandler	// ErrorHandler to be used to output errors and warn messages.
 	wspace 		int 			// Current whitespace
 	regex 		*regexp.Regexp  // Shebang Stripper
+	last 		*Token			// Last token to be appended
 }
 
 // Resets the tokenizer state variables
@@ -61,11 +62,19 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 				endpos: self.position.Copy(),
 			})
 
+			println("inserting eof")
+
 			break
 		}
 
 		// Ignore newlines
-		if b == '\n' || b == '\r' {
+		if b == '\n' {
+			if self.last != nil {
+				println("ADDING TO ", self.last.value, "  -  ", self.last.newline)
+				self.last.newline++
+			}
+			continue
+		} else if b == '\r' {
 			continue
 		// Whitespace Incrementor
 		} else if IsWhitespace(b) {
@@ -193,6 +202,7 @@ func (self *Tokenizer) ConsumeAmount(amt int) {
 // Append a token created prior
 func (self *Tokenizer) Append(t *Token) {
 	self.tokens = append(self.tokens, *t)
+	self.last = &self.tokens[len(self.tokens) - 1]
 }
 
 // Debug: Dump Tokens

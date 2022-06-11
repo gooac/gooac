@@ -28,9 +28,7 @@ const (
 	NodeVariableValList 		NodeType = "ValueList"
 
 	NodeIdentifierNormal 		NodeType = "IdentNormal"
-
 	NodeIdentifierColon			NodeType = "IdentColon"
-
 	NodeIdentifier				NodeType = "Identifier"
 
 	NodeIndex					NodeType = "Indexing"

@@ -278,6 +278,50 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 			}
 
 		// Identifier Resolution
+	case TokenColon:
+		
+		self.Consume()
+
+		id := self.Peek()
+
+		if id.token != TokenIdent {
+			self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, id.value)
+			break
+		}
+
+		n = &ASTNode{
+			nodetype: NodeMemberMeth,
+			values: map[string]ASTValue{
+				"ident":{
+					token: self.Consume(),
+				},
+			},
+			body: []*ASTNode{
+				n,
+			},
+		}
+
+		paren := self.Consume()
+		
+		if paren.token != TokenLParen {
+			self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "(", paren.value)
+			break
+		}
+
+		callargs := self.HandleCall()
+
+		body := []*ASTNode{
+			n,
+		}
+
+		body = append(body, callargs...)
+
+		n = &ASTNode{
+			nodetype: NodeMethodCall,
+			body: body,
+		}
+
+		continue
 		case TokenPeriod:
 			self.Consume()
 

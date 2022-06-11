@@ -305,22 +305,29 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 						token: self.Consume(),
 					},
 				},
-				callee: n,
+				body: []*ASTNode{
+					n,
+				},
 			}
 
 			paren := self.Consume()
 			
 			if paren.token != TokenLParen {
-				self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "(",)
+				self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "(", paren.value)
 				break
 			}
 
 			callargs := self.HandleCall()
 
+			body := []*ASTNode{
+				n,
+			}
+
+			body = append(body, callargs...)
+
 			n = &ASTNode{
 				nodetype: NodeMethodCall,
-				body: callargs,
-				callee: n,
+				body: body,
 			}
 
 			continue

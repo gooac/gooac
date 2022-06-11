@@ -19,7 +19,6 @@ type ASTNode struct {
 	values map[string]ASTValue
 	parent *ASTNode
 
-	callee *ASTNode
 	trailing *ASTNode
 }
 
@@ -70,9 +69,6 @@ func (self *AST) Add(n *ASTNode) {
 func (self *ASTNode) Dump(lvl int) {
 	fmt.Printf("%v┌%v", strings.Repeat("│", lvl), string(self.nodetype))
 
-	if self.callee != nil {
-		fmt.Printf(" (callee: %v)", self.callee)
-	}
 	println()
 
 	if self.values != nil {

@@ -225,6 +225,7 @@ func (self *Tokenizer) HandleIdentifier(ch byte, ws int) {
 func (self *Tokenizer) HandleString(starter byte, ws int) (TokenizationError, byte) {
 	str := string("")
 	spos := self.position.Copy()
+	badstr := false
 
 	for {
 		err, p := self.Peek()
@@ -237,6 +238,10 @@ func (self *Tokenizer) HandleString(starter byte, ws int) (TokenizationError, by
 
 			_, p := self.Consume()
 			str += string(p)
+		} else if p == '\n' {
+			badstr = true
+			str += string(p)
+			self.Consume()
 		} else if p != starter {
 			str += string(p)
 			self.Consume()
@@ -253,6 +258,12 @@ func (self *Tokenizer) HandleString(starter byte, ws int) (TokenizationError, by
 		endpos: 	self.position.Copy(),
 		wspace: 	ws,
 	})
+
+	// This allows consumation of the entire string before
+	// breaking, otherwise would throw 2 errors
+	if badstr {
+		return TokErrUnfinishedString, starter
+	}
 
 	return TokErrNone, '_'
 }

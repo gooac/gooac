@@ -71,7 +71,8 @@ func (self *Parser) QualifyIdent() ASTNode {
 // Index Handler
 func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 	iscolon := false
-	
+	errored := false
+
 	for {
 		sym := self.Peek()
 
@@ -90,14 +91,25 @@ func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 				self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "]", rbrac.value)
 			}
 
+			if iscolon && !errored {
+				errored = true
+				self.err.Error(ErrorFatal, ParserErrorAssigningToMethod, "Did you put a colon before subscripting?")
+			}
+
 			continue
 		} else if (sym.token != TokenPeriod) && (sym.token != TokenColon) {
 			break
 		}
 
+		if iscolon && !errored {
+			errored = true
+			self.err.Error(ErrorFatal, ParserErrorAssigningToMethod, "Did you put a colon before subscripting?")
+		}
+
 		if sym.token == TokenColon {
-			if iscolon {
-				self.err.Error(ErrorFatal, ParserErrorAssigningToMethod)
+			if iscolon && !errored {
+				errored = true
+				self.err.Error(ErrorFatal, ParserErrorAssigningToMethod, "Do you have 2 colons?")
 			}
 
 			iscolon = true

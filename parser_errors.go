@@ -15,7 +15,7 @@ const (
 
 	ParserErrorExpectedArgumentName 	= "Expected argument name in function argument list, got '%v'"
 	ParserErrorMissingEnd				= "Expected 'end' on %v block, got '<EOF>', did you miss an end?"
-	ParserErrorAssigningToMethod 		= "Attempting to assign to a method call '%v'"
+	ParserErrorAssigningToMethod 		= "Attempting to assign to Method Call (%v)"
 
 	ParserErrorElseMustBeLast			= "'else' block must be the last declared block in an if statement"
 	ParserErrorElseAlreadyDeclared		= "'else' block already declared in if statement"

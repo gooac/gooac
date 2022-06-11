@@ -117,17 +117,6 @@ func (self *Parser) NewHandleIndexing() *ASTNode {
 	}
 }
 
-// Handle Index + Create Node + Add onto existing node
-func (self *Parser) HandleIndexingNode(n *ASTNode) *ASTNode {
-	indexing := self.NewHandleIndexing()
-	
-	if indexing != nil {
-		n.trailing = indexing
-	}
-
-	return n
-}
-
 var Priorities = map[TokenType]struct {
 	left  int
 	right int

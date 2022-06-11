@@ -18,8 +18,6 @@ type ASTNode struct {
 
 	values map[string]ASTValue
 	parent *ASTNode
-
-	trailing *ASTNode
 }
 
 type ASTValue struct {
@@ -84,26 +82,6 @@ func (self *ASTNode) Dump(lvl int) {
 			
 			print(ind, ch, k, ": ")
 			v.Print()
-		}
-	}
-
-	if self.trailing != nil {
-		ind := strings.Repeat("│", lvl)
-
-		if self.trailing.nodetype != NodeIndex {
-			fmt.Printf("%v]%v\n", ind, self.trailing)
-		} else {
-			fmt.Printf("%v] ", ind)
-			for _, v := range self.trailing.body {
-				if v.nodetype == NodeIdentifierNormal {
-					print(".", v.values["value"].token.value)
-				} else if v.nodetype == NodeIdentifierColon {
-					print(":", v.values["value"].token.value)
-				} else {
-					fmt.Printf("[%v]", v.nodetype)
-				}
-			}
-			println()
 		}
 	}
 

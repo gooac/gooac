@@ -1,10 +1,7 @@
 package gooa
 
-// _ = 123			TODO ERROR, dont allow _ assignment
-
 type NodeType string
 const (
-	NodeInvalid 				NodeType = "<!!  INVALID NODE  !!>"
 	NodeProgram 				NodeType = "ProgramRoot"
 	NodeComment 				NodeType = "Comment"
 

@@ -27,7 +27,7 @@ func (self *Parser) GetExpression() *ASTNode {
 	if IsLiteralType(p.token) {
 		bin := self.HandleBinExprLiteral(p)
 
-		return self.HandleIndexingNode(bin)
+		return bin
 	} 
 	
 	var node *ASTNode
@@ -554,7 +554,7 @@ func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 		break
 	}
 
-	self.HandleIndexingNode(self.HandleBinExpr(&node))
+	self.HandleBinExpr(&node)
 
 	assign := &ASTNode{
 		nodetype: NodeVariableAssignment,
@@ -564,8 +564,6 @@ func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 		},
 	}
 	
-	self.ast.Add(assign)
-
 	return assign 
 }
 

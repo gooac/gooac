@@ -409,7 +409,7 @@ func (self *Parser) HandleComment(t Token) {
 	self.ast.Add(n)
 }
 
-func (self *Parser) HandleCall() []*ASTNode {
+func (self *Parser) HandleCall() *ASTNode {
 	nodes := []*ASTNode{}
 
 	for {
@@ -446,7 +446,10 @@ func (self *Parser) HandleCall() []*ASTNode {
 
 	self.Consume()
 
-	return nodes
+	return &ASTNode{
+		nodetype: NodeCallArgs,
+		body: nodes,
+	}
 }
 
 func (self *Parser) HandleLParen(n ASTNode) {
@@ -458,7 +461,7 @@ func (self *Parser) HandleLParen(n ASTNode) {
 		&n,
 	}
 
-	body = append(body, args...)
+	body = append(body, args)
 
 	replacement := ASTNode{
 		nodetype: NodeCall,

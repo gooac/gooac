@@ -248,6 +248,8 @@ type Token struct {
 	newline 	int 					// Newlines after token
 
 	kwtype 		KeywordType				// Type of keyword if a keyword at all	
+
+	special 	string					// Special value for strings
 }
 
 func (self *Token) ToASTValue() ASTValue {

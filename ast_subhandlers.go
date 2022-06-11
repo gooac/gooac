@@ -213,6 +213,7 @@ func (self *Parser) HandleBinExprLiteral(lit Token) *ASTNode {
 
 		if IsNumberLiteralType(next.token) {
 			self.Consume()
+			toks = append(toks, prd)
 			toks = append(toks, next)
 		} else if next.token == TokenHexNumber {
 			self.Consume()
@@ -233,6 +234,19 @@ func (self *Parser) HandleBinExprLiteral(lit Token) *ASTNode {
 	})
 }
 
+// Quickly generate NodeCallArgs
+func (self *Parser) QuickGenCall(n *ASTNode) *ASTNode {
+	node := &ASTNode{
+		nodetype: NodeCallArgs,
+		body: []*ASTNode{
+			n,
+		},
+	}
+
+
+	return node
+}
+
 // Handles all forms of trails
 func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 	for {
@@ -248,7 +262,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 				n,
 			}
 
-			body = append(body, callargs...)
+			body = append(body, callargs)
 
 			ntype := NodeCall
 
@@ -267,7 +281,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 				nodetype: NodeCall,
 				body: []*ASTNode{
 					n,
-					{
+					self.QuickGenCall(&ASTNode{
 						nodetype: NodeLiteral,
 						values: map[string]ASTValue{
 							"value": {
@@ -276,7 +290,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 								},
 							},
 						},
-					},
+					}),
 				},
 			}
 		case TokenLCurl:
@@ -285,7 +299,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 				nodetype: NodeCall,
 				body: []*ASTNode{
 					n,
-					&node,
+					self.QuickGenCall(&node),
 				},
 			}
 
@@ -326,7 +340,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 			n,
 		}
 
-		body = append(body, callargs...)
+		body = append(body, callargs)
 
 		n = &ASTNode{
 			nodetype: NodeMethodCall,

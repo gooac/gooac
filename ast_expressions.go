@@ -25,7 +25,7 @@ const (
 	NodeVariableNameList		NodeType = "VariableNameList"
 	NodeVariableValList 		NodeType = "VariableValList"
 
-	NodeIdentSegNorm 		NodeType = "IdentifierNormal"
+	NodeIdentSegNorm 			NodeType = "IdentifierNormal"
 	NodeIdentSegColon			NodeType = "IdentifierColon"
 	
 	NodeIdentifier				NodeType = "Identifier"
@@ -37,6 +37,7 @@ const (
 	NodeMemberMeth				NodeType = "MemberMeth"
 	NodeMemberExpr				NodeType = "MemberExpr"
 
+	NodeCallArgs				NodeType = "CallArguments"
 	NodeCall					NodeType = "Call"
 	NodeMethodCall				NodeType = "MethodCall"
 	

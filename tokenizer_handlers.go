@@ -1,5 +1,6 @@
-
 package gooa
+
+import "strings"
 
 // Internal: Handle Multiline String Equal Sequences
 func (self *Tokenizer) HandleEqSeq(offset int) int {
@@ -257,6 +258,7 @@ func (self *Tokenizer) HandleString(starter byte, ws int) (TokenizationError, by
 		position: 	spos,
 		endpos: 	self.position.Copy(),
 		wspace: 	ws,
+		special: 	string(starter),
 	})
 
 	// This allows consumation of the entire string before
@@ -284,9 +286,9 @@ func (self *Tokenizer) HandleMultilineString(ch byte, ws int) (TokenizationError
 		return TokErrNone, 0
 	}
 
-	
+
 	amt := self.HandleEqSeq(0)
-	self.Consume()
+	self.ConsumeAmount(amt)
 	
 	str := string("")
 
@@ -332,6 +334,7 @@ func (self *Tokenizer) HandleMultilineString(ch byte, ws int) (TokenizationError
 		value: string(str),
 		position: start,
 		endpos: self.position.Copy(),
+		special: strings.Repeat("=", amt),
 	})
 
 	return TokErrNone, 0

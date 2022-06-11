@@ -62,15 +62,12 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 				endpos: self.position.Copy(),
 			})
 
-			println("inserting eof")
-
 			break
 		}
 
 		// Ignore newlines
 		if b == '\n' {
 			if self.last != nil {
-				println("ADDING TO ", self.last.value, "  -  ", self.last.newline)
 				self.last.newline++
 			}
 			continue

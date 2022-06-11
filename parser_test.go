@@ -76,8 +76,10 @@ func TestParser(t *testing.T) {
 		return
 	}
 
+	_=ast
 	println("\n-- ASTDUMP --")
 	// fmt.Printf("%v", ast)
 	ast.Dump()
 	println("-- ASTDUMP --")
+	fmt.Print()
 }

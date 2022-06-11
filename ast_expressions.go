@@ -2,53 +2,55 @@ package gooa
 
 type NodeType string
 const (
-	NodeProgram 				NodeType = "ProgramRoot"
+	NodeProgram 				NodeType = "Program"
 	NodeComment 				NodeType = "Comment"
 
-	NodeBool					NodeType = "Boolean"
-	NodeNil						NodeType = "NilValue"
+	NodeBool					NodeType = "Bool"
+	NodeNil						NodeType = "Nil"
 	NodeLiteral 				NodeType = "Literal"
 	NodeLabel 					NodeType = "Label"
 	NodeLength					NodeType = "Length"
 	NodeNegate 					NodeType = "Negate"
 	NodeNot						NodeType = "Not"
-	NodeVariadicResolve			NodeType = "Variadic"
+	NodeVariadicResolve			NodeType = "VariadicResolve"
 
 	NodeTable					NodeType = "Table"
 	NodeTableMapValue			NodeType = "TableMapValue"
 	NodeTableArrayValue			NodeType = "TableArrayValue"
 	
-	NodeVariableAssignment 		NodeType = "VarAssign"
-	NodeLocalVariableAssignment NodeType = "LocalAssign"
-	NodeLocalVariableStub 		NodeType = "LocalStub"
+	NodeVariableAssignment 		NodeType = "VariableAssignment"
+	NodeLocalVariableAssignment NodeType = "LocalVariableAssignment"
+	NodeLocalVariableStub 		NodeType = "LocalVariableStub"
 
-	NodeVariableNameList		NodeType = "NameList"
-	NodeVariableValList 		NodeType = "ValueList"
+	NodeVariableNameList		NodeType = "VariableNameList"
+	NodeVariableValList 		NodeType = "VariableValList"
 
-	NodeIdentifierNormal 		NodeType = "IdentNormal"
-	NodeIdentifierColon			NodeType = "IdentColon"
+	NodeIdentSegNorm 		NodeType = "IdentifierNormal"
+	NodeIdentSegColon			NodeType = "IdentifierColon"
+	
 	NodeIdentifier				NodeType = "Identifier"
+	NodeIdentifierMethod		NodeType = "IdentifierMethod"
 
-	NodeIndex					NodeType = "Indexing"
+	NodeIndex					NodeType = "Index"
 
-	NodeMemberIdent				NodeType = "DotIndex"
-	NodeMemberMeth				NodeType = "ColonIndex"
-	NodeMemberExpr				NodeType = "BracketIndex"
+	NodeMemberIdent				NodeType = "MemberIdent"
+	NodeMemberMeth				NodeType = "MemberMeth"
+	NodeMemberExpr				NodeType = "MemberExpr"
 
 	NodeCall					NodeType = "Call"
 	NodeMethodCall				NodeType = "MethodCall"
 	
-	NodeBinaryExpression		NodeType = "BinaryExpr"
+	NodeBinaryExpression		NodeType = "BinaryExpression"
 
-	NodeAnonymousFunction		NodeType = "AnonFunc"
+	NodeAnonymousFunction		NodeType = "AnonymousFunction"
 	NodeLocalFunction 			NodeType = "LocalFunction"
 	NodeFunction 				NodeType = "Function"
-	NodeArgumentList 			NodeType = "ArgList"
-	NodeArgumentListOmitted 	NodeType = "OmittedArgList"
-	NodeArgumentNormal			NodeType = "ArgNorm"
-	NodeArgumentVariadic 		NodeType = "ArgVariadic"
-	NodeNamedArgumentDef		NodeType = "ArgListMember"
-	NodeNamedArgumentVariadic 	NodeType = "ArgListMemberVariadic"
+	NodeArgumentList 			NodeType = "ArgumentList"
+	NodeArgumentListOmitted 	NodeType = "ArgumentListOmitted"
+	NodeArgumentNormal			NodeType = "ArgumentNormal"
+	NodeArgumentVariadic 		NodeType = "ArgumentVariadic"
+	NodeNamedArgumentDef		NodeType = "NamedArgumentDef"
+	NodeNamedArgumentVariadic 	NodeType = "NamedArgumentVariadic"
 
 	NodeReturn					NodeType = "Return"
 	NodeArbitraryScope			NodeType = "ArbitraryScope"
@@ -67,9 +69,9 @@ const (
 	NodeForI					NodeType = "ForI"
 	NodeForIIncr				NodeType = "ForIIncr"
 
-	NodeRepeat					NodeType = "RepeatUntil"
+	NodeRepeat					NodeType = "Repeat"
 
-	NodeWhile					NodeType = "WhileLoop"
+	NodeWhile					NodeType = "While"
 
 	NodeGoto					NodeType = "Goto"
 )

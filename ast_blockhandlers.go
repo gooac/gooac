@@ -17,7 +17,7 @@ func (self *Parser) ExpectToken(tty TokenType) *Token {
 
 	if next.token != tty {
 		self.err.Error(ErrorFatal, ParserErrorExpectedToken, tokenNames[tty], next.value)
-		return nil
+		return &InvalidToken
 	}
 
 	return &next
@@ -336,7 +336,7 @@ func (self *Parser) HandleFor(t Token) *ASTNode {
 		
 		if ident.token == TokenIdent {
 			args.body = append(args.body, &ASTNode{
-				nodetype: NodeIdentifierNormal,
+				nodetype: NodeIdentSegNorm,
 				values: map[string]ASTValue{
 					"value": {
 						token: self.Consume(),

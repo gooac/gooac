@@ -13,6 +13,7 @@ This is just a compiler library. Feel free to use this in its current state but 
     - **C-Style Comments**: Allows you to use C-Style comments the same way you would normal comments.
     - **Continue Statement**: Adds the `continue` keyword to control loops in a much simpler way.
     - **Function Attributes**: Allows you to easily wrap functions through a series of calls, progressively allowing you to create functions that are more powerful than they need to be.
+    - **Shorthand Syntax**: Adds a few different shorthands for certain things, also just a few fun ones for looks.
 
 
 # Quickstart
@@ -45,7 +46,7 @@ func main() {
 ```
 
 # Syntax Examples
-### Named Function Arguments
+## Named Function Arguments
 ```lua
 function test(a = 1, b = 2, c = somecall(1, 2, 3))
     print(a, b, c)
@@ -60,7 +61,7 @@ function test(a, b, c)
 end
 ```
 
-### C-Style Comments
+## C-Style Comments
 ```lua
 // Valid Comment
 -- Also Valid Comment
@@ -74,7 +75,7 @@ end
 ]==]
 ```
 
-### Continue Statement
+## Continue Statement
 > Warning: Continues in the base compilre use goto, dont be surprised if you break something with it, especially relating to whether the goto is actually visible to the scope continue is being used in.
 
 ```lua
@@ -98,7 +99,7 @@ for i=0, 10 do
 end
 ```
 
-### Function Attributes
+## Function Attributes
 ```lua
 $[route("/")]
 local function index()
@@ -112,3 +113,46 @@ local function index()
 end
 index = route(index, "/")
 ```
+
+## Shorthand Syntax
+- Call Arrow
+    ```lua
+    a()->b()
+    ```
+    Compiles into
+
+    ```lua
+    a():b()
+    ```
+
+- Short Function Declarations
+    ```lua
+    fn a
+    end
+    ```
+    Compiles into
+    ```
+    function a()
+    end
+    ```
+
+    This is based on 2 things, first, `fn` is a shorthand for `function`.  
+    Second, function arguments can be omitted and are identical to `()`
+
+- Elif!
+    ```lua
+    if a then
+
+    elseif b then
+
+    elif c then
+
+    end
+    ```
+    Compiles into
+    ```lua
+    if a then
+    elseif b then
+    elseif c then
+    end
+    ```

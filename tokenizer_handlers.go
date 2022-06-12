@@ -392,7 +392,6 @@ func (self *Tokenizer) HandleComment(ch byte, ws int) {
 	start := self.position.Copy()
 	nexterr, nextp := self.Peek()
 
-	// Feat: CallArrow Syntax
 	if nextp == '>' {
 		self.Consume()
 		self.Append(&Token{

@@ -23,16 +23,16 @@ package main
 import "github.com/gooac/gooac"
 
 func main() {
-    g := gooa.Gooa()
+    g := gooa.NewGooa()
     g.Use(gooa.AttributeMiddleware())
 
-    code, err := g.Compile(`
-        print(123)
+    code, err := g.Compile([]byte(`
+		print(123)
 
-        function a(b=c)
-            print(b)
-        end
-    `)
+		function a(b=c)
+			print(b)
+		end
+	`))
 
     if err {
         print("Errored! ", err)

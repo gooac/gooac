@@ -1,3 +1,3 @@
-module github.com/gooac/gooa
+module github.com/gooac/gooac
 
 go 1.18

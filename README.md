@@ -39,7 +39,7 @@ func main() {
         return 
     }
     
-    print("Success")
+    print("Success! \n")
     print(code)
 }
 ```

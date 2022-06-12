@@ -6,6 +6,7 @@ const (
 	CompilerErrUnexpectedHex string		= "Unexpected Hex Literal '%v' near '%v'"
 	CompilerErrElseifIsLast	string 		= "'else' blocks must be the last blocks in if statements"
 	CompilerErrMultipleElse	string 		= "Cannot have multiple 'else' blocks in one if statement"
+	CompilerErrUsedOutsideLoop string	= "Attempting to use '%v' outside of a loop"
 )
 
 func (self *Compiler) Expect(n *ASTNode, a... NodeType) bool {

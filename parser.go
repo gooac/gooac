@@ -14,6 +14,8 @@ type Parser struct {
 	index 		int
 	err 		ErrorHandler
 	unhandled 	[]Token
+
+	middleware 	*MiddlewareHandler
 }
 
 // Reset Parse State
@@ -40,7 +42,7 @@ func (self *Parser) Parse(toks []Token, err *ErrorHandler) (AST, bool) {
 
 	self.err.Dump()
 
-	return *self.ast, self.err.ShouldStop()
+	return *self.middleware.PostParse(self.ast), self.err.ShouldStop()
 }
 
 // Ignore the given token
@@ -164,7 +166,6 @@ func (self *Parser) HandleKeyword(t Token) (bool, *ASTNode) {
 	return false, nil
 }
 
-// Handle Parsing For Recursivity
 func (self *Parser) HandleParsing() (bool, KeywordType) {
 	if self.err.ShouldImmediatelyStop() {
 		return true, KeywordEmpty
@@ -176,6 +177,10 @@ func (self *Parser) HandleParsing() (bool, KeywordType) {
 	
 	curtok := self.PeekSome(0)	
 	
+	if self.middleware.ParserHandleToken(self, curtok) {
+		return false, KeywordEmpty
+	}
+
 	if curtok.token == TokenEOF {
 		return true, KeywordEmpty
 	}

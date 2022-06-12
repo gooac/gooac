@@ -2,20 +2,21 @@ package gooa
 
 import (
 	"errors"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 // Main construct to tokenize Gooa code
 type Tokenizer struct {
-	tokenizing 	[]byte 			// Whats being currently tokenized
-	tokens 		[]Token			// Output tokens
-	index 		int				// Current index being read of tokenization string 
-	position 	*Position		// Position the tokenizers at
-	err 		ErrorHandler	// ErrorHandler to be used to output errors and warn messages.
-	wspace 		int 			// Current whitespace
-	regex 		*regexp.Regexp  // Shebang Stripper
-	last 		*Token			// Last token to be appended
+	tokenizing 	[]byte 					// Whats being currently tokenized
+	tokens 		[]Token					// Output tokens
+	index 		int						// Current index being read of tokenization string 
+	position 	*Position				// Position the tokenizers at
+	err 		ErrorHandler			// ErrorHandler to be used to output errors and warn messages.
+	wspace 		int 					// Current whitespace
+	regex 		*regexp.Regexp  		// Shebang Stripper
+	last 		*Token					// Last token to be appended
+	middleware 	*MiddlewareHandler	 	// All instantiated middleware for the tokenizer
 }
 
 // Resets the tokenizer state variables
@@ -36,7 +37,7 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 		self.regex = regexp.MustCompile(`\A\#.*`)
 	}
 
-	self.tokenizing	= self.regex.ReplaceAll(str, []byte{})
+	self.tokenizing	= self.middleware.PreTokenize(self.regex.ReplaceAll(str, []byte{}))
 	self.tokens 	= []Token{}
 	self.index 		= 0
 	self.position	= &Position{1, 0, &self.index}
@@ -63,6 +64,10 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 			})
 
 			break
+		}
+
+		if self.middleware.TokenizerHandleByte(self, b) {
+			continue
 		}
 
 		// Ignore newlines
@@ -140,7 +145,7 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 
 	self.err.Dump()
 
-	return self.tokens, self.err.ShouldStop()
+	return self.middleware.PostTokenize(self.tokens), self.err.ShouldStop()
 }
 
 // Should the tokenizer stop?

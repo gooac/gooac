@@ -57,9 +57,9 @@ const (
 	TokenAnd 					// 'and'
 	TokenOr 					// 'or'
 
-	TokenTrue
-	TokenFalse
-	TokenNil
+	TokenTrue					// true
+	TokenFalse					// false
+	TokenNil					// nil
 
 								// Custom Tokens:
 	TokenAttr					// $

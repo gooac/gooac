@@ -10,6 +10,8 @@ type Compiler struct {
 	lastloops 	[]*ASTNode
 	hascontin	bool
 
+	middleware 	*MiddlewareHandler
+
 	luv 		string
 }
 
@@ -35,7 +37,27 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 			break
 		}
 
-		self.output += self.CompileNode(v)
+		switch v.nodetype {
+		case NodeComment,
+		NodeVariableAssignment,
+		NodeLocalVariableStub,
+		NodeLocalVariableAssignment,
+		NodeCall,
+		NodeMethodCall,
+		NodeLocalFunction,
+		NodeFunction,
+		NodeReturn,
+		NodeRepeat,
+		NodeIf,
+		NodeForI,
+		NodeForIterator,
+		NodeWhile,
+		NodeGoto:
+			self.output += self.CompileNode(v)
+		default:
+			self.err.Error(ErrorFatal, CompilerErrUnexpected, v.nodetype)
+		}
+
 
 		if k != l {
 			self.output += ";"
@@ -43,8 +65,8 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 	}
 
 	self.err.Dump()
-
-	return self.output, self.err.ShouldStop()
+	
+	return self.middleware.PostCompile(self.output), self.err.ShouldStop()
 }
 
 func (self *Compiler) CompileNode(n *ASTNode) string {
@@ -74,13 +96,10 @@ func (self *Compiler) CompileNode(n *ASTNode) string {
 	case NodeBinaryExpression: 					str += self.CompileBinaryExpr(n)
 	case NodeForI: 								str += self.CompileForI(n)
 	case NodeForIterator: 						str += self.CompileForIter(n)
-
 	case NodeContinue: 							str += self.CompileContinue(n)
-
-	// case NodeWhile: 							str += self.CompileWhile(n)
-	// case NodeRepeat: 							str += self.CompileRepeat(n)
-	// case NodeBreak: 							str += self.CompileBreak(n)
-	// case NodeBreak: 							str += self.CompileContinue(n)
+	case NodeWhile: 							str += self.CompileWhile(n)
+	case NodeRepeat: 							str += self.CompileRepeat(n)
+	case NodeBreak: 							str += self.CompileBreak(n)
 	}
 
 	// fmt.Printf("[%v] %v\n", n.nodetype, str)

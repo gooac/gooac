@@ -1,4 +1,5 @@
 
-for k,v in pairs(test) do
-    
+$[abc(123), cum()]
+function d()
+
 end

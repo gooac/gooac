@@ -514,8 +514,8 @@ func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 			p := self.QualifyIdent()
 			nn := self.HandleTrails(&p)
 
-			if p.nodetype != NodeIdentifier {
-				self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, p)
+			if nn.nodetype != NodeIdentifier && nn.nodetype != NodeMemberExpr {
+				self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, nn.nodetype)
 				break
 			}
 

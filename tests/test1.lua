@@ -1,5 +1,4 @@
 
-if a then
-else
-elseif a then
+for k,v in pairs(test) do
+    
 end

@@ -238,6 +238,13 @@ func (self *Tokenizer) HandleString(starter byte, ws int) (TokenizationError, by
 			self.Consume()
 
 			_, p := self.Consume()
+			
+			if p == '\r' {
+				self.Consume()
+				str += "\\n"
+				continue
+			}
+
 			str += string(p)
 		} else if p == '\n' {
 			badstr = true

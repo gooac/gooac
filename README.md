@@ -2,6 +2,7 @@
 # ![Gooa](assets/gooacompiler.png)
 
 Gooa is a Lua Preprocessor written in Go *(very clearly)*   
+  
 This is just a compiler library. Feel free to use this in its current state but I am currently working on tools to wrap this.
 
 # Features
@@ -13,6 +14,35 @@ This is just a compiler library. Feel free to use this in its current state but 
     - **Continue Statement**: Adds the `continue` keyword to control loops in a much simpler way.
     - **Function Attributes**: Allows you to easily wrap functions through a series of calls, progressively allowing you to create functions that are more powerful than they need to be.
 
+
+# Quickstart
+Add to your module with `go get github.com/gooac/gooac`
+
+```go
+package main
+import "github.com/gooac/gooac"
+
+func main() {
+    g := gooa.Gooa()
+    g.Use(gooa.AttributeMiddleware())
+
+    code, err := g.Compile(`
+        print(123)
+
+        function a(b=c)
+            print(b)
+        end
+    `)
+
+    if err {
+        print("Errored! ", err)
+        return 
+    }
+    
+    print("Success")
+    print(code)
+}
+```
 
 # Syntax Examples
 ### Named Function Arguments

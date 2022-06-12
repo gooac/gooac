@@ -414,10 +414,53 @@ func (self *Compiler) CompileForIter(n *ASTNode) string {
 	return s
 }
 
+func (self *Compiler) CompileWhile(n *ASTNode) string {
+	s := "while "
+
+	s += self.CompileNode(n.body[0])
+
+	s += " do;"
+
+	self.PushLoop(n)
+	s += self.CompileScope(n, 1)
+	s += self.PopLoop(n)
+
+	s += "end;"
+
+	return s
+}
+
+func (self *Compiler) CompileRepeat(n *ASTNode) string {
+	s := "repeat "
+
+	self.PushLoop(n)
+	s += self.CompileScope(n.body[1], 0)
+	s += self.PopLoop(n)
+
+	s += "until " + self.CompileNode(n.body[0])
+	
+	return s
+}
+
+
 func (self *Compiler) CompileContinue(n *ASTNode) string {
+	if len(self.lastloops) == 0 {
+		self.err.Error(ErrorGeneral, CompilerErrUsedOutsideLoop, "continue")
+		return ""
+	}
+
 	last := self.lastloops[len(self.lastloops) - 1]
 
 	self.hascontin = true
 	
 	return fmt.Sprintf("goto cont_%p", last)
-}
+}	
+
+func (self *Compiler) CompileBreak(n *ASTNode) string {
+	if len(self.lastloops) == 0 {
+		self.err.Error(ErrorGeneral, CompilerErrUsedOutsideLoop, "break")
+		return ""
+	}
+
+	return "break"
+}	

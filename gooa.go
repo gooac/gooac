@@ -63,9 +63,9 @@ func (self *Gooa) CompileFile(s string) (string, error) {
 		return "Error Reading File", err
 	}
 
-	c, valid := self.Compile(f)
+	c, errored := self.Compile(f)
 
-	if !valid {
+	if errored {
 		return "", errors.New(c)
 	}
 

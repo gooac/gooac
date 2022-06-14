@@ -16,6 +16,7 @@ type ErrorHandler interface {
 	SetErrorRealm(ErrorRealm) bool
 	SetPosition(*Position)
 	ShouldStop() bool
+	SetStop(bool)
 	ShouldImmediatelyStop() bool
 }
 
@@ -115,6 +116,10 @@ func (self *BaseErrorHandler) SetErrorRealm(rlm ErrorRealm) bool {
 
 func (self *BaseErrorHandler) ShouldStop() bool {
 	return self.stop
+}
+
+func (self *BaseErrorHandler) SetStop(b bool) {
+	self.stop = b
 }
 
 func (self *BaseErrorHandler) SetPosition(pos *Position) {

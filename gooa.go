@@ -1,6 +1,7 @@
 package gooa
 
 import (
+	"errors"
 	"os"
 )
 
@@ -55,14 +56,20 @@ func (self *Gooa) Compile(s []byte) (string, bool) {
 	return cmp, false
 }
 
-func (self *Gooa) CompileFile(s string) (string, bool) {
-	f, err := os.ReadFile("tests/testc.lua")
+func (self *Gooa) CompileFile(s string) (string, error) {
+	f, err := os.ReadFile(s)
 
 	if err != nil {
-		return "Failed to read file", true
+		return "Error Reading File", err
 	}
 
-	return self.Compile(f)
+	c, valid := self.Compile(f)
+
+	if !valid {
+		return "", errors.New(c)
+	}
+
+	return c, nil
 }
 
 func (self *Gooa) Use(m Middleware) {

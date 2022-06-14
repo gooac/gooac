@@ -12,7 +12,7 @@ func TestGooa(t *testing.T) {
 	g := NewGooa()
 	g.Use(AttributeMiddleware())
 
-	f,_ := gooatest_lua.ReadFile("tests/test1.lua")
+	f,_ := gooatest_lua.ReadFile("tests/cl_circles.lua")
 	out, failed := g.Compile(f)
 	
 	if failed {

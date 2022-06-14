@@ -39,6 +39,7 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 
 		switch v.nodetype {
 		case NodeComment,
+		NodeArbitraryScope,
 		NodeVariableAssignment,
 		NodeLocalVariableStub,
 		NodeLocalVariableAssignment,

@@ -485,6 +485,11 @@ func (self *Tokenizer) HandleCStyleComment(ch byte, ws int) {
 				break
 			}
 
+			if p == '\r' {
+				self.Consume()
+				continue
+			}
+
 			if p == '*' && pn == '/' {
 				self.Consume()
 				self.Consume()
@@ -516,6 +521,7 @@ func (self *Tokenizer) HandleMultilineComment(start *Position, eqamt int) {
 		}
 
 		if p == '\r' {
+			self.Consume()
 			continue
 		}
 

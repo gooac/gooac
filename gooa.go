@@ -6,50 +6,50 @@ import (
 )
 
 type Gooa struct {
-	compiler Compiler
-	parser Parser
-	tokenizer Tokenizer
+	Compiler Compiler
+	Parser Parser
+	Tokenizer Tokenizer
 
-	err ErrorHandler
-	middleware *MiddlewareHandler
+	Err ErrorHandler
+	Middleware *MiddlewareHandler
 }
 
 func NewGooa() *Gooa {
 	gooa := &Gooa{
-		compiler: Compiler{},
-		parser: Parser{},
-		tokenizer: Tokenizer{},
+		Compiler: Compiler{},
+		Parser: Parser{},
+		Tokenizer: Tokenizer{},
 	
-		err: &BaseErrorHandler{},
-		middleware: &MiddlewareHandler{},
+		Err: &BaseErrorHandler{},
+		Middleware: &MiddlewareHandler{},
 	}
 
-	gooa.compiler.middleware = gooa.middleware
-	gooa.parser.middleware = gooa.middleware
-	gooa.tokenizer.middleware = gooa.middleware
+	gooa.Compiler.middleware = gooa.Middleware
+	gooa.Parser.middleware = gooa.Middleware
+	gooa.Tokenizer.middleware = gooa.Middleware
 
 	return gooa 
 }
 
 func (self *Gooa) Compile(s []byte) (string, bool) {
-	toks, stop := self.tokenizer.Tokenize(s, &self.err)
+	toks, stop := self.Tokenizer.Tokenize(s, &self.Err)
 
 	if stop {
-		self.err.Error(ErrorFatal, "Tokenization Failed")
+		self.Err.Error(ErrorFatal, "Tokenization Failed")
 		return "Failed to tokenize", true
 	}
 
-	ast, stop := self.parser.Parse(toks, &self.err)
+	ast, stop := self.Parser.Parse(toks, &self.Err)
 
 	if stop {
-		self.err.Error(ErrorFatal, "Parsing Failed")
+		self.Err.Error(ErrorFatal, "Parsing Failed")
 		return "Failed to parse", true
 	}
 
-	cmp, stop := self.compiler.Compile(&ast, &self.err)
+	cmp, stop := self.Compiler.Compile(&ast, &self.Err)
 
 	if stop {
-		self.err.Error(ErrorFatal, "Compilation Failed")
+		self.Err.Error(ErrorFatal, "Compilation Failed")
 		return "Failed to compile", true
 	}
 
@@ -73,5 +73,5 @@ func (self *Gooa) CompileFile(s string) (string, error) {
 }
 
 func (self *Gooa) Use(m Middleware) {
-	self.middleware.Use(m)
+	self.Middleware.Use(m)
 }

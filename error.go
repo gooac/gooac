@@ -18,6 +18,7 @@ type ErrorHandler interface {
 	ShouldStop() bool
 	SetStop(bool)
 	ShouldImmediatelyStop() bool
+	Reset()
 }
 
 // Error Level Definitions
@@ -120,6 +121,14 @@ func (self *BaseErrorHandler) ShouldStop() bool {
 
 func (self *BaseErrorHandler) SetStop(b bool) {
 	self.stop = b
+}
+
+func (self *BaseErrorHandler) Reset() {
+	self.stop = false
+	self.errors = nil
+	self.position = nil
+	self.realm = -1
+	self.fatal = false
 }
 
 func (self *BaseErrorHandler) SetPosition(pos *Position) {

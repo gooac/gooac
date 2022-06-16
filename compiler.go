@@ -31,13 +31,13 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 
 	self.err.SetErrorRealm(ErrorRealmCompiler)
 
-	l := len(ast.root.body) - 1
-	for k, v := range ast.root.body {
+	l := len(ast.RootNode.Body) - 1
+	for k, v := range ast.RootNode.Body {
 		if self.err.ShouldImmediatelyStop() {
 			break
 		}
 
-		switch v.nodetype {
+		switch v.Nodetype {
 		case NodeComment,
 		NodeArbitraryScope,
 		NodeVariableAssignment,
@@ -56,7 +56,7 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 		NodeGoto:
 			self.output += self.CompileNode(v)
 		default:
-			self.err.Error(ErrorFatal, CompilerErrUnexpected, v.nodetype)
+			self.err.Error(ErrorFatal, CompilerErrUnexpected, v.Nodetype)
 		}
 
 
@@ -73,7 +73,7 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 func (self *Compiler) CompileNode(n *ASTNode) string {
 	str := ""
 
-	switch n.nodetype {
+	switch n.Nodetype {
 	case NodeLiteral:							str += self.CompileLiteral(n)
 	case NodeIf:								str += self.CompileIf(n)
 	case NodeIdentifierMethod, NodeIdentifier:	str += self.CompileIdentifier(n)
@@ -103,12 +103,12 @@ func (self *Compiler) CompileNode(n *ASTNode) string {
 	case NodeBreak: 							str += self.CompileBreak(n)
 	}
 
-	// fmt.Printf("[%v] %v\n", n.nodetype, str)
+	// fmt.Printf("[%v] %v\n", n.Nodetype, str)
 	return str
 }
 
 func (self *Compiler) Exists(n *ASTNode, index int) bool {
-	if (len(n.body) - 1) <= index {
+	if (len(n.Body) - 1) <= index {
 		return true
 	}
 

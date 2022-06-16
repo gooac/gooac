@@ -6,7 +6,7 @@ import "fmt"
 func (self *Compiler) CompileLiteral(n *ASTNode) string {
 	s := ""
 
-	first := n.values["value"].tokens[0]
+	first := n.Values["value"].tokens[0]
 
 	if first.token == TokenString {
 		s += first.special + first.value + first.special
@@ -15,7 +15,7 @@ func (self *Compiler) CompileLiteral(n *ASTNode) string {
 		first.value + 
 		"]" + first.special + "]"
 	} else {
-		for k, v := range n.values["value"].tokens {
+		for k, v := range n.Values["value"].tokens {
 			if k != 0 && v.token == TokenHexNumber {
 				self.err.Error(ErrorGeneral, CompilerErrUnexpectedHex, v.value, s)
 			}
@@ -29,15 +29,15 @@ func (self *Compiler) CompileLiteral(n *ASTNode) string {
 
 func (self *Compiler) CompileIdentifier(n *ASTNode) string {
 	s := ""
-	for k, v := range n.body {
-		if v.nodetype == NodeIdentSegNorm {
+	for k, v := range n.Body {
+		if v.Nodetype == NodeIdentSegNorm {
 			if k != 0 {
 				s += "."
 			}
 			
-			s += v.values["value"].token.value
-		} else if v.nodetype == NodeIdentSegColon {
-			s += ":" + v.values["value"].token.value
+			s += v.Values["value"].token.value
+		} else if v.Nodetype == NodeIdentSegColon {
+			s += ":" + v.Values["value"].token.value
 		} else {
 			s += "[" + self.CompileNode(v) + "]"
 		}
@@ -47,10 +47,10 @@ func (self *Compiler) CompileIdentifier(n *ASTNode) string {
 }
 
 func (self *Compiler) CompileMemberExpr(n *ASTNode) string {
-	s := self.CompileNode(n.body[0])
+	s := self.CompileNode(n.Body[0])
 
 	s += "["
-	s += self.CompileNode(n.body[1])
+	s += self.CompileNode(n.Body[1])
 	s += "]"
 
 	return s
@@ -59,7 +59,7 @@ func (self *Compiler) CompileMemberExpr(n *ASTNode) string {
 func (self *Compiler) CompileScope(n *ASTNode, skip int) string {
 	s := ""
 
-	for k, v := range n.body {
+	for k, v := range n.Body {
 		if k < skip {
 			continue
 		}
@@ -74,10 +74,10 @@ func (self *Compiler) CompileScope(n *ASTNode, skip int) string {
 func (self *Compiler) CompileCall(n *ASTNode) string {
 	s := ""
 
-	s += self.CompileNode(n.body[0])
+	s += self.CompileNode(n.Body[0])
 
 	if self.Exists(n, 1) {
-		next := n.body[1]
+		next := n.Body[1]
 
 		s += self.CompileCallArguments(next)
 	}
@@ -88,7 +88,7 @@ func (self *Compiler) CompileCall(n *ASTNode) string {
 func (self *Compiler) CompileCallArguments(n *ASTNode) string {
 	s := "("
 
-	for k, v := range n.body {
+	for k, v := range n.Body {
 		if k != 0 {
 			s += ","
 		}
@@ -106,18 +106,18 @@ func (self *Compiler) CompileIf(n *ASTNode) string {
 	var err string
 
 	s := "if("
-	s += self.CompileNode(n.body[0])
+	s += self.CompileNode(n.Body[0])
 	s += ")then;"
 
-	for k, v := range n.body {
+	for k, v := range n.Body {
 		if k == 0 {
 			continue
 		}
 
-		if v.nodetype == NodeIfScope {
+		if v.Nodetype == NodeIfScope {
 			s += self.CompileScope(v, 0)
-		} else if v.nodetype == NodeElseScope {
-			if len(v.body) == 0 {
+		} else if v.Nodetype == NodeElseScope {
+			if len(v.Body) == 0 {
 				continue
 			}
 
@@ -132,9 +132,9 @@ func (self *Compiler) CompileIf(n *ASTNode) string {
 				err = CompilerErrElseifIsLast
 			}
 
-			s += "elseif(" + self.CompileNode(v.body[0]) + ")then;"
+			s += "elseif(" + self.CompileNode(v.Body[0]) + ")then;"
 
-			for k, vv := range v.body {
+			for k, vv := range v.Body {
 				if k == 0 {
 					continue
 				}
@@ -155,10 +155,10 @@ func (self *Compiler) CompileIf(n *ASTNode) string {
 func (self *Compiler) CompileVarAssign(n *ASTNode) string {
 	s := ""
 
-	names := n.body[0]
-	values := n.body[1]
+	names := n.Body[0]
+	Values := n.Body[1]
 
-	for k, v := range names.body {
+	for k, v := range names.Body {
 		if k != 0 {
 			s += ","
 		}
@@ -169,7 +169,7 @@ func (self *Compiler) CompileVarAssign(n *ASTNode) string {
 	
 	s += "="
 
-	for k,v := range values.body {
+	for k,v := range Values.Body {
 		if k != 0 {
 			s += ","
 		}
@@ -183,7 +183,7 @@ func (self *Compiler) CompileVarAssign(n *ASTNode) string {
 func (self *Compiler) CompileLocalStubs(n *ASTNode) string {
 	s := "local "
 
-	for k, v := range n.body[0].body {
+	for k, v := range n.Body[0].Body {
 		if k != 0 {
 			s += ","
 		}
@@ -197,7 +197,7 @@ func (self *Compiler) CompileLocalStubs(n *ASTNode) string {
 func (self *Compiler) CompileLocalAssign(n *ASTNode) string {
 	s := "local "
 
-	for k, v := range n.body[0].body {
+	for k, v := range n.Body[0].Body {
 		if k != 0 {
 			s += ","
 		}
@@ -207,7 +207,7 @@ func (self *Compiler) CompileLocalAssign(n *ASTNode) string {
 
 	s += "="
 
-	for k, v := range n.body[1].body {
+	for k, v := range n.Body[1].Body {
 		if k != 0 {
 			s += ","
 		}
@@ -219,15 +219,15 @@ func (self *Compiler) CompileLocalAssign(n *ASTNode) string {
 }
 
 func (self *Compiler) CompileLabel(n *ASTNode) string {
-	return "::" + n.values["label"].token.value + "::"
+	return "::" + n.Values["label"].token.value + "::"
 }
 
 func (self *Compiler) CompileGoto(n *ASTNode) string {
-	return "goto " + n.values["label"].token.value
+	return "goto " + n.Values["label"].token.value
 }
 
 func (self *Compiler) CompileBool(n *ASTNode) string {
-	return n.values["value"].token.value
+	return n.Values["value"].token.value
 }
 
 func (self *Compiler) CompileNil(n *ASTNode) string {
@@ -235,15 +235,15 @@ func (self *Compiler) CompileNil(n *ASTNode) string {
 }
 
 func (self *Compiler) CompileLength(n *ASTNode) string {
-	return "#" + self.CompileNode(n.body[0])
+	return "#" + self.CompileNode(n.Body[0])
 }
 
 func (self *Compiler) CompileNegate(n *ASTNode) string {
-	return "-" + self.CompileNode(n.body[0])
+	return "-" + self.CompileNode(n.Body[0])
 }
 
 func (self *Compiler) CompileNot(n *ASTNode) string {
-	return "not " + self.CompileNode(n.body[0])
+	return "not " + self.CompileNode(n.Body[0])
 }
 
 func (self *Compiler) CompileVar(n *ASTNode) string {
@@ -253,23 +253,23 @@ func (self *Compiler) CompileVar(n *ASTNode) string {
 func (self *Compiler) CompileTable(n *ASTNode) string {
 	s := "({"
 
-	ln := len(n.body) - 1
+	ln := len(n.Body) - 1
 	append := ","
-	for k, v := range n.body {
+	for k, v := range n.Body {
 		if k == ln {
 			append = ""
 		}
 
-		if v.nodetype == NodeTableArrayValue {
-			s += "" + self.CompileNode(v.body[0]) + "" + append
-		} else if v.nodetype == NodeTableMapValue {
-			pref := self.CompileNode(v.body[0])
+		if v.Nodetype == NodeTableArrayValue {
+			s += "" + self.CompileNode(v.Body[0]) + "" + append
+		} else if v.Nodetype == NodeTableMapValue {
+			pref := self.CompileNode(v.Body[0])
 
-			if v.body[0].nodetype != NodeIdentifier {
+			if v.Body[0].Nodetype != NodeIdentifier {
 				pref = "[" + pref + "]"
 			}
 			
-			s += pref + "=" + self.CompileNode(v.body[1]) + "" + append
+			s += pref + "=" + self.CompileNode(v.Body[1]) + "" + append
 		}
 	}
 
@@ -279,9 +279,9 @@ func (self *Compiler) CompileTable(n *ASTNode) string {
 func (self *Compiler) CompileAnonFunc(n *ASTNode) string {
 	s := "(function"
 
-	s += self.CompileFuncArgs(n.body[0])
+	s += self.CompileFuncArgs(n.Body[0])
 
-	for k, v := range n.body {
+	for k, v := range n.Body {
 		if k == 0 {
 			continue
 		}
@@ -294,33 +294,33 @@ func (self *Compiler) CompileAnonFunc(n *ASTNode) string {
 }
 
 func (self *Compiler) CompileFuncArgs(n *ASTNode) string {
-	if n.nodetype == NodeArgumentListOmitted {
+	if n.Nodetype == NodeArgumentListOmitted {
 		return "()"
 	}
 
 	s := "("
 	post := ")"
 	
-	length := len(n.body) - 1
+	length := len(n.Body) - 1
 	apnd := ","
-	for k, v := range n.body {
+	for k, v := range n.Body {
 		if k == length {
 			apnd = ""
 		}
 		
-		if v.nodetype == NodeArgumentNormal {
-			s += v.values["name"].token.value + apnd
-		} else if v.nodetype == NodeArgumentVariadic {
+		if v.Nodetype == NodeArgumentNormal {
+			s += v.Values["name"].token.value + apnd
+		} else if v.Nodetype == NodeArgumentVariadic {
 			s += "..." + apnd
-		} else if v.nodetype == NodeNamedArgumentDef {
-			name := v.values["name"].token.value
+		} else if v.Nodetype == NodeNamedArgumentDef {
+			name := v.Values["name"].token.value
 			s += name + apnd
 
-			post += name + "=" + name + " or " + self.CompileNode(v.body[0]) + ";"
-		} else if v.nodetype == NodeNamedArgumentVariadic {
+			post += name + "=" + name + " or " + self.CompileNode(v.Body[0]) + ";"
+		} else if v.Nodetype == NodeNamedArgumentVariadic {
 			s += "..." + apnd
 			
-			post += "local " + v.values["name"].token.value + "={...};"
+			post += "local " + v.Values["name"].token.value + "={...};"
 		}
 	}
 
@@ -334,10 +334,10 @@ func (self *Compiler) CompileLocalFunc(n *ASTNode) string {
 func (self *Compiler) CompileFunc(n *ASTNode) string {
 	s := "function "
 
-	s += self.CompileIdentifier(n.body[0])
-	s += self.CompileFuncArgs(n.body[1])
+	s += self.CompileIdentifier(n.Body[0])
+	s += self.CompileFuncArgs(n.Body[1])
 
-	for k, v := range n.body {
+	for k, v := range n.Body {
 		if k <= 1 {
 			continue
 		}
@@ -351,23 +351,23 @@ func (self *Compiler) CompileFunc(n *ASTNode) string {
 }
 
 func (self *Compiler) CompileBinaryExpr(n *ASTNode) string {
-	return "(" + self.CompileNode(n.body[0]) + " " + n.values["operator"].token.value + " "  + self.CompileNode(n.body[1]) + ")"
+	return "(" + self.CompileNode(n.Body[0]) + " " + n.Values["operator"].token.value + " "  + self.CompileNode(n.Body[1]) + ")"
 }
 
 func (self *Compiler) CompileForI(n *ASTNode) string {
 	s := "for "
 	skip := 2
 
-	s += n.values["identifier"].token.value + "="
+	s += n.Values["identifier"].token.value + "="
 
-	s += self.CompileNode(n.body[0])
+	s += self.CompileNode(n.Body[0])
 
 	s += ","
 
-	s += self.CompileNode(n.body[1])
+	s += self.CompileNode(n.Body[1])
 
-	if (len(n.body) - 1) >= 2 && n.body[2].nodetype == NodeForIIncr {
-		s += "," + self.CompileNode(n.body[2].body[0])
+	if (len(n.Body) - 1) >= 2 && n.Body[2].Nodetype == NodeForIIncr {
+		s += "," + self.CompileNode(n.Body[2].Body[0])
 
 		skip = 3
 	}
@@ -386,9 +386,9 @@ func (self *Compiler) CompileForI(n *ASTNode) string {
 func (self *Compiler) CompileForIter(n *ASTNode) string {
 	s := "for "
 
-	l := len(n.body[0].body) - 1
-	for k, v := range n.body[0].body {
-		s += v.values["value"].token.value
+	l := len(n.Body[0].Body) - 1
+	for k, v := range n.Body[0].Body {
+		s += v.Values["value"].token.value
 		
 		if k != l {
 			s += ","
@@ -397,9 +397,9 @@ func (self *Compiler) CompileForIter(n *ASTNode) string {
 
 	s += " in "
 
-	s += self.CompileNode(n.body[1])
+	s += self.CompileNode(n.Body[1])
 
-	if n.body[1].nodetype != NodeCall && n.body[1].nodetype != NodeMethodCall {
+	if n.Body[1].Nodetype != NodeCall && n.Body[1].Nodetype != NodeMethodCall {
 		s += " "
 	}
 	s += "do;"
@@ -417,7 +417,7 @@ func (self *Compiler) CompileForIter(n *ASTNode) string {
 func (self *Compiler) CompileWhile(n *ASTNode) string {
 	s := "while "
 
-	s += self.CompileNode(n.body[0])
+	s += self.CompileNode(n.Body[0])
 
 	s += " do;"
 
@@ -434,10 +434,10 @@ func (self *Compiler) CompileRepeat(n *ASTNode) string {
 	s := "repeat "
 
 	self.PushLoop(n)
-	s += self.CompileScope(n.body[1], 0)
+	s += self.CompileScope(n.Body[1], 0)
 	s += self.PopLoop(n)
 
-	s += "until " + self.CompileNode(n.body[0])
+	s += "until " + self.CompileNode(n.Body[0])
 	
 	return s
 }

@@ -14,8 +14,8 @@ func (self *Parser) HandleIdentStub() *ASTNode {
 	ident := self.Consume()
 
 	expr := &ASTNode{
-		nodetype: NodeIdentSegNorm,
-		values: map[string]ASTValue{
+		Nodetype: NodeIdentSegNorm,
+		Values: map[string]ASTValue{
 			"value": {
 				token: ident,
 			},
@@ -28,7 +28,7 @@ func (self *Parser) HandleIdentStub() *ASTNode {
 	}
 
 	if sym.token == TokenColon {
-		expr.nodetype = NodeIdentSegColon
+		expr.Nodetype = NodeIdentSegColon
 	}
 
 	return expr
@@ -43,7 +43,7 @@ func (self *Parser) HandleAssignmentIdent() *ASTNode {
 // Versatile 'TokenIdent' handler
 func (self *Parser) QualifyIdent() ASTNode {
 	node := ASTNode{
-		nodetype: NodeIdentifier,
+		Nodetype: NodeIdentifier,
 	}
 
 	initial := self.Consume()
@@ -53,9 +53,9 @@ func (self *Parser) QualifyIdent() ASTNode {
 		return node
 	}
 
-	node.body = []*ASTNode{
-		{nodetype: NodeIdentSegNorm,
-			values: map[string]ASTValue{
+	node.Body = []*ASTNode{
+		{Nodetype: NodeIdentSegNorm,
+			Values: map[string]ASTValue{
 				"value": {
 					token: initial,
 				},
@@ -84,7 +84,7 @@ func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 				return node
 			}
 
-			node.body = append(node.body, expr)
+			node.Body = append(node.Body, expr)
 
 			rbrac := self.Consume()
 			if rbrac.token != TokenRBrac {
@@ -115,11 +115,11 @@ func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 			iscolon = true
 		}
 
-		node.body = append(node.body, self.HandleIdentStub())
+		node.Body = append(node.Body, self.HandleIdentStub())
 	}
 
 	if iscolon {
-		node.nodetype = NodeIdentifierMethod
+		node.Nodetype = NodeIdentifierMethod
 	}
 
 	return node
@@ -169,7 +169,7 @@ func (self *Parser) HandleBinExpr(lhs_ast *ASTNode) *ASTNode {
 		return nil
 	}
 
-	body := []*ASTNode{
+	Body := []*ASTNode{
 		lhs_ast,
 		rhs_ast,
 	}
@@ -178,17 +178,17 @@ func (self *Parser) HandleBinExpr(lhs_ast *ASTNode) *ASTNode {
 	// properly, as i have absolutely no idea what they are
 	// supposed to indicate :) i know im a dumdum
 	// just... verify this later it isnt important now
-	if (lhs_ast.nodetype == NodeBinaryExpression) &&
-		(Priorities[lhs_ast.values["operator"].token.token].left > prio.left) {
+	if (lhs_ast.Nodetype == NodeBinaryExpression) &&
+		(Priorities[lhs_ast.Values["operator"].token.token].left > prio.left) {
 
-		body[0] = rhs_ast
-		body[1] = lhs_ast
+		Body[0] = rhs_ast
+		Body[1] = lhs_ast
 	}
 
 	node := &ASTNode{
-		nodetype: NodeBinaryExpression,
-		body:     body,
-		values: map[string]ASTValue{
+		Nodetype: NodeBinaryExpression,
+		Body:     Body,
+		Values: map[string]ASTValue{
 			"operator": {
 				token: p,
 			},
@@ -225,8 +225,8 @@ func (self *Parser) HandleBinExprLiteral(lit Token) *ASTNode {
 	}
 
 	return self.HandleBinExpr(&ASTNode{
-		nodetype: NodeLiteral,
-		values: map[string]ASTValue{
+		Nodetype: NodeLiteral,
+		Values: map[string]ASTValue{
 			"value": {
 				tokens: toks,
 			},
@@ -237,8 +237,8 @@ func (self *Parser) HandleBinExprLiteral(lit Token) *ASTNode {
 // Quickly generate NodeCallArgs
 func (self *Parser) QuickGenCall(n *ASTNode) *ASTNode {
 	node := &ASTNode{
-		nodetype: NodeCallArgs,
-		body: []*ASTNode{
+		Nodetype: NodeCallArgs,
+		Body: []*ASTNode{
 			n,
 		},
 	}
@@ -258,32 +258,32 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 
 			callargs := self.HandleCall()
 
-			body := []*ASTNode{
+			Body := []*ASTNode{
 				n,
 			}
 
-			body = append(body, callargs)
+			Body = append(Body, callargs)
 
 			ntype := NodeCall
 
-			if n.nodetype == NodeIdentifierMethod {
+			if n.Nodetype == NodeIdentifierMethod {
 				ntype = NodeMethodCall
 			}
 
 			n = &ASTNode{
-				nodetype: ntype,
-				body:     body,
+				Nodetype: ntype,
+				Body:     Body,
 			}
 
 			continue
 		case TokenString, TokenMLString:
 			n = &ASTNode{
-				nodetype: NodeCall,
-				body: []*ASTNode{
+				Nodetype: NodeCall,
+				Body: []*ASTNode{
 					n,
 					self.QuickGenCall(&ASTNode{
-						nodetype: NodeLiteral,
-						values: map[string]ASTValue{
+						Nodetype: NodeLiteral,
+						Values: map[string]ASTValue{
 							"value": {
 								tokens: []Token{
 									self.Consume(),
@@ -296,8 +296,8 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 		case TokenLCurl:
 			node := self.HandleTable(self.Peek())
 			n = &ASTNode{
-				nodetype: NodeCall,
-				body: []*ASTNode{
+				Nodetype: NodeCall,
+				Body: []*ASTNode{
 					n,
 					self.QuickGenCall(&node),
 				},
@@ -316,13 +316,13 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 		}
 
 		n = &ASTNode{
-			nodetype: NodeMemberMeth,
-			values: map[string]ASTValue{
+			Nodetype: NodeMemberMeth,
+			Values: map[string]ASTValue{
 				"ident":{
 					token: self.Consume(),
 				},
 			},
-			body: []*ASTNode{
+			Body: []*ASTNode{
 				n,
 			},
 		}
@@ -336,15 +336,15 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 
 		callargs := self.HandleCall()
 
-		body := []*ASTNode{
+		Body := []*ASTNode{
 			n,
 		}
 
-		body = append(body, callargs)
+		Body = append(Body, callargs)
 
 		n = &ASTNode{
-			nodetype: NodeMethodCall,
-			body: body,
+			Nodetype: NodeMethodCall,
+			Body: Body,
 		}
 
 		continue
@@ -359,13 +359,13 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 			}
 
 			n = &ASTNode{
-				nodetype: NodeMemberIdent,
-				values: map[string]ASTValue{
+				Nodetype: NodeMemberIdent,
+				Values: map[string]ASTValue{
 					"ident": {
 						token: self.Consume(),
 					},
 				},
-				body: []*ASTNode{
+				Body: []*ASTNode{
 					n,
 				},
 			}
@@ -389,8 +389,8 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 			}
 
 			n = &ASTNode{
-				nodetype: NodeMemberExpr,
-				body: []*ASTNode{
+				Nodetype: NodeMemberExpr,
+				Body: []*ASTNode{
 					n,
 					expr,
 				},

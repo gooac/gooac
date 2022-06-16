@@ -43,8 +43,8 @@ func (mw *attributeMiddleware) Handle(self *Parser) {
 
 		expr := self.ExpectExpression(p)
 
-		if expr.nodetype != NodeCall && expr.nodetype != NodeMethodCall {
-			self.err.Error(ErrorFatal, AttributeMiddlewareMustBeCall, expr.nodetype)
+		if expr.Nodetype != NodeCall && expr.Nodetype != NodeMethodCall {
+			self.err.Error(ErrorFatal, AttributeMiddlewareMustBeCall, expr.Nodetype)
 			return
 		}
 
@@ -90,32 +90,32 @@ func (mw *attributeMiddleware) Handle(self *Parser) {
 		self.Consume()
 		fn = self.HandleFunction(n)
 
-		fn.nodetype = NodeLocalFunction
+		fn.Nodetype = NodeLocalFunction
 	}
 
-	if fn == nil || (fn.nodetype != NodeFunction && fn.nodetype != NodeLocalFunction) {
-		self.err.Error(ErrorFatal, AttributeMiddlewareMustBeFn, fn.nodetype)
+	if fn == nil || (fn.Nodetype != NodeFunction && fn.Nodetype != NodeLocalFunction) {
+		self.err.Error(ErrorFatal, AttributeMiddlewareMustBeFn, fn.Nodetype)
 		return
 	}
 
 	self.ast.Add(fn)
 
 	for _, v := range nodes {
-		v.body[1].body = append([]*ASTNode{
-			fn.body[0],
-		}, v.body[1].body...)
+		v.Body[1].Body = append([]*ASTNode{
+			fn.Body[0],
+		}, v.Body[1].Body...)
 		self.ast.Add(&ASTNode{
-			nodetype: NodeVariableAssignment,
-			body: []*ASTNode{
+			Nodetype: NodeVariableAssignment,
+			Body: []*ASTNode{
 				{
-					nodetype: NodeVariableNameList,
-					body: []*ASTNode{
-						fn.body[0],
+					Nodetype: NodeVariableNameList,
+					Body: []*ASTNode{
+						fn.Body[0],
 					},
 				},
 				{
-					nodetype: NodeVariableValList,
-					body: []*ASTNode{
+					Nodetype: NodeVariableValList,
+					Body: []*ASTNode{
 						v,
 					},
 				},

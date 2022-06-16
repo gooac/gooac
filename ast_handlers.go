@@ -54,8 +54,8 @@ func (self *Parser) GetExpression() *ASTNode {
 	case TokenTrue, TokenFalse:
 		self.Consume()
 		node = &ASTNode{
-			nodetype: NodeBool,
-			values: map[string]ASTValue{
+			Nodetype: NodeBool,
+			Values: map[string]ASTValue{
 				"value": {
 					token: p,
 				},
@@ -64,7 +64,7 @@ func (self *Parser) GetExpression() *ASTNode {
 	case TokenNil:
 		self.Consume()
 		node = &ASTNode{
-			nodetype: NodeNil,
+			Nodetype: NodeNil,
 		}
 
 	case TokenKeyword:
@@ -73,8 +73,8 @@ func (self *Parser) GetExpression() *ASTNode {
 	case TokenSub:
 		self.Consume()
 		node = &ASTNode{
-			nodetype: NodeNegate,
-			body: []*ASTNode{
+			Nodetype: NodeNegate,
+			Body: []*ASTNode{
 				self.ExpectExpression(self.Peek()),
 			},
 		}
@@ -82,8 +82,8 @@ func (self *Parser) GetExpression() *ASTNode {
 	case TokenLength:
 		self.Consume()
 		node = &ASTNode{
-			nodetype: NodeLength,
-			body: []*ASTNode{
+			Nodetype: NodeLength,
+			Body: []*ASTNode{
 				self.ExpectExpression(self.Peek()),
 			},
 		}
@@ -91,8 +91,8 @@ func (self *Parser) GetExpression() *ASTNode {
 	case TokenNot:
 		self.Consume()
 		node = &ASTNode{
-			nodetype: NodeNot,
-			body: []*ASTNode{
+			Nodetype: NodeNot,
+			Body: []*ASTNode{
 				self.ExpectExpression(self.Peek()),
 			},
 		}
@@ -101,13 +101,13 @@ func (self *Parser) GetExpression() *ASTNode {
 		self.Consume()
 
 		node = &ASTNode{
-			nodetype: NodeVariadicResolve,
+			Nodetype: NodeVariadicResolve,
 		}
 
 	case TokenPeriod:
 		node = &ASTNode{
-			nodetype: NodeLiteral,
-			values: map[string]ASTValue{
+			Nodetype: NodeLiteral,
+			Values: map[string]ASTValue{
 				"value": {
 					tokens: []Token{
 						self.Consume(),
@@ -124,7 +124,7 @@ func (self *Parser) GetExpression() *ASTNode {
 
 	if node == nil {
 		return &ASTNode{
-			nodetype: NodeProgram,
+			Nodetype: NodeProgram,
 		}
 	}
 
@@ -146,7 +146,7 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 		self.Consume()
 		node := self.HandleFunction(self.Peek())
 
-		node.nodetype = NodeLocalFunction
+		node.Nodetype = NodeLocalFunction
 
 		self.ast.Add(node)
 
@@ -154,8 +154,8 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 	}
 
 	idents := ASTNode{
-		nodetype: NodeVariableNameList,
-		body:     []*ASTNode{},
+		Nodetype: NodeVariableNameList,
+		Body:     []*ASTNode{},
 	}
 
 	for {
@@ -167,7 +167,7 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 		}
 
 		ident := self.QualifyIdent()
-		idents.body = append(idents.body, &ident)
+		idents.Body = append(idents.Body, &ident)
 
 		n := self.Peek()
 		if n.token == TokenComma {
@@ -186,9 +186,9 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 
 	if next.token != TokenEq {
 		node := &ASTNode{
-			nodetype: NodeLocalVariableStub,
+			Nodetype: NodeLocalVariableStub,
 
-			body: []*ASTNode{
+			Body: []*ASTNode{
 				&idents,
 			},
 		}
@@ -201,8 +201,8 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 	self.Consume()
 
 	node := &ASTNode{
-		nodetype: NodeVariableValList,
-		body:     []*ASTNode{},
+		Nodetype: NodeVariableValList,
+		Body:     []*ASTNode{},
 	}
 
 	for {
@@ -216,7 +216,7 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 			expr = self.ExpectExpression(p)
 		}
 
-		node.body = append(node.body, expr)
+		node.Body = append(node.Body, expr)
 
 		n := self.Peek()
 		if n.token == TokenComma {
@@ -228,8 +228,8 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 	}
 
 	self.ast.Add(&ASTNode{
-		nodetype: NodeLocalVariableAssignment,
-		body: []*ASTNode{
+		Nodetype: NodeLocalVariableAssignment,
+		Body: []*ASTNode{
 			&idents,
 			node,
 		},
@@ -245,9 +245,9 @@ func (self *Parser) HandleLocal(t Token) *ASTNode {
 func (self *Parser) HandleTable(t Token) ASTNode {
 	self.Consume()
 	node := ASTNode{
-		nodetype: NodeTable,
-		body:     []*ASTNode{},
-		values:   map[string]ASTValue{},
+		Nodetype: NodeTable,
+		Body:     []*ASTNode{},
+		Values:   map[string]ASTValue{},
 	}
 
 	for {
@@ -266,8 +266,8 @@ func (self *Parser) HandleTable(t Token) ASTNode {
 			self.ExpectToken(TokenRBrac)
 
 			val := ASTNode{
-				nodetype: NodeTableMapValue,
-				body: []*ASTNode{
+				Nodetype: NodeTableMapValue,
+				Body: []*ASTNode{
 					expr,
 				},
 			}
@@ -282,8 +282,8 @@ func (self *Parser) HandleTable(t Token) ASTNode {
 				valexpr = self.ExpectExpression(self.Peek())
 			}
 
-			val.body = append(val.body, valexpr)
-			node.body = append(node.body, &val)
+			val.Body = append(val.Body, valexpr)
+			node.Body = append(node.Body, &val)
 		case TokenIdent:
 			n := self.PeekSome(1)
 
@@ -292,14 +292,14 @@ func (self *Parser) HandleTable(t Token) ASTNode {
 				self.Consume()
 
 				val := ASTNode{
-					nodetype: NodeTableMapValue,
-					body: []*ASTNode{
+					Nodetype: NodeTableMapValue,
+					Body: []*ASTNode{
 						{
-							nodetype: NodeIdentifier,
-							body: []*ASTNode{
+							Nodetype: NodeIdentifier,
+							Body: []*ASTNode{
 								{
-									nodetype: NodeIdentSegNorm,
-									values: map[string]ASTValue{
+									Nodetype: NodeIdentSegNorm,
+									Values: map[string]ASTValue{
 										"value": {
 											token: p,
 										},
@@ -318,8 +318,8 @@ func (self *Parser) HandleTable(t Token) ASTNode {
 					valexpr = self.ExpectExpression(self.Peek())
 				}
 
-				val.body = append(val.body, valexpr)
-				node.body = append(node.body, &val)
+				val.Body = append(val.Body, valexpr)
+				node.Body = append(node.Body, &val)
 				break
 			}
 
@@ -334,13 +334,13 @@ func (self *Parser) HandleTable(t Token) ASTNode {
 			}
 
 			val := ASTNode{
-				nodetype: NodeTableArrayValue,
-				body: []*ASTNode{
+				Nodetype: NodeTableArrayValue,
+				Body: []*ASTNode{
 					expr,
 				},
 			}
 
-			node.body = append(node.body, &val)
+			node.Body = append(node.Body, &val)
 		}
 
 		n := self.Peek()
@@ -378,15 +378,15 @@ func (self *Parser) HandleIdentifier(t Token) *ASTNode {
 }
 
 func (self *Parser) HandleComment(t Token) {
-	if self.ast.last != nil && self.ast.last.nodetype == NodeComment && t.newline > 1 {
+	if self.ast.LastNode != nil && self.ast.LastNode.Nodetype == NodeComment && t.newline > 1 {
 		new := []Token{}
 
-		new = append(new, self.ast.last.values["comments"].tokens...)
+		new = append(new, self.ast.LastNode.Values["comments"].tokens...)
 		new = append(new, t)
 
-		*self.ast.last = ASTNode{
-			nodetype: NodeComment,
-			values: map[string]ASTValue{
+		*self.ast.LastNode = ASTNode{
+			Nodetype: NodeComment,
+			Values: map[string]ASTValue{
 				"comments": {
 					tokens: new,
 				},
@@ -396,8 +396,8 @@ func (self *Parser) HandleComment(t Token) {
 	}
 
 	n := &ASTNode{
-		nodetype: NodeComment,
-		values: map[string]ASTValue{
+		Nodetype: NodeComment,
+		Values: map[string]ASTValue{
 			"comments": {
 				tokens: []Token{
 					t,
@@ -447,8 +447,8 @@ func (self *Parser) HandleCall() *ASTNode {
 	self.Consume()
 
 	return &ASTNode{
-		nodetype: NodeCallArgs,
-		body: nodes,
+		Nodetype: NodeCallArgs,
+		Body: nodes,
 	}
 }
 
@@ -457,18 +457,18 @@ func (self *Parser) HandleLParen(n ASTNode) {
 
 	args := self.HandleCall()
 
-	body := []*ASTNode{
+	Body := []*ASTNode{
 		&n,
 	}
 
-	body = append(body, args)
+	Body = append(Body, args)
 
 	replacement := ASTNode{
-		nodetype: NodeCall,
-		body:     body,
+		Nodetype: NodeCall,
+		Body:     Body,
 	}
 
-	*self.ast.last = replacement
+	*self.ast.LastNode = replacement
 }
 
 func (self *Parser) HandleLBrac(n ASTNode) {
@@ -483,26 +483,26 @@ func (self *Parser) HandleLBrac(n ASTNode) {
 	}
 
 	replacement := ASTNode{
-		nodetype: NodeMemberExpr,
-		body: []*ASTNode{
+		Nodetype: NodeMemberExpr,
+		Body: []*ASTNode{
 			&n,
 			expr,
 		},
 	}
 
-	*self.ast.last = replacement
+	*self.ast.LastNode = replacement
 }
 
 func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 	names := ASTNode{
-		nodetype: NodeVariableNameList,
-		body: []*ASTNode{
+		Nodetype: NodeVariableNameList,
+		Body: []*ASTNode{
 			&t,
 		},
 	}
 	node := ASTNode{
-		nodetype: NodeVariableValList,
-		body:     []*ASTNode{},
+		Nodetype: NodeVariableValList,
+		Body:     []*ASTNode{},
 	}
 
 	for {
@@ -514,12 +514,12 @@ func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 			p := self.QualifyIdent()
 			nn := self.HandleTrails(&p)
 
-			if nn.nodetype != NodeIdentifier && nn.nodetype != NodeMemberExpr {
-				self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, nn.nodetype)
+			if nn.Nodetype != NodeIdentifier && nn.Nodetype != NodeMemberExpr {
+				self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, nn.Nodetype)
 				break
 			}
 
-			names.body = append(names.body, nn)
+			names.Body = append(names.Body, nn)
 
 			continue
 		} else {
@@ -551,7 +551,7 @@ func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 			expr = self.ExpectExpression(p)
 		}
 
-		node.body = append(node.body, expr)
+		node.Body = append(node.Body, expr)
 
 		if self.Peek().token == TokenComma {
 			self.Consume()
@@ -564,8 +564,8 @@ func (self *Parser) HandleAssignment(t ASTNode) *ASTNode {
 	self.HandleBinExpr(&node)
 
 	assign := &ASTNode{
-		nodetype: NodeVariableAssignment,
-		body: []*ASTNode{
+		Nodetype: NodeVariableAssignment,
+		Body: []*ASTNode{
 			&names,
 			&node,
 		},
@@ -584,8 +584,8 @@ func (self *Parser) HandleLabel(t Token) *ASTNode {
 	}
 
 	node := &ASTNode{
-		nodetype: NodeLabel,
-		values: map[string]ASTValue{
+		Nodetype: NodeLabel,
+		Values: map[string]ASTValue{
 			"label": {
 				token: *ident,
 			},

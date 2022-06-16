@@ -49,7 +49,7 @@ func (self *Parser) HandleArgList() *ASTNode {
 
 	if lpar.token != TokenLParen {
 		return &ASTNode{
-			nodetype: NodeArgumentListOmitted,
+			Nodetype: NodeArgumentListOmitted,
 		}
 	}
 
@@ -63,7 +63,7 @@ func (self *Parser) HandleArgList() *ASTNode {
 		if name.token == TokenVariadic {
 			self.Consume()
 			args = append(args, &ASTNode{
-				nodetype: NodeArgumentVariadic,
+				Nodetype: NodeArgumentVariadic,
 			})
 
 			break
@@ -79,8 +79,8 @@ func (self *Parser) HandleArgList() *ASTNode {
 		p := self.Peek()
 		if p.token == TokenComma || p.token == TokenRParen {
 			args = append(args, &ASTNode{
-				nodetype: NodeArgumentNormal,
-				values: map[string]ASTValue{
+				Nodetype: NodeArgumentNormal,
+				Values: map[string]ASTValue{
 					"name": {
 						token: name,
 					},
@@ -104,8 +104,8 @@ func (self *Parser) HandleArgList() *ASTNode {
 
 		if next.token == TokenVariadic {
 			args = append(args, &ASTNode{
-				nodetype: NodeNamedArgumentVariadic,
-				values: map[string]ASTValue{
+				Nodetype: NodeNamedArgumentVariadic,
+				Values: map[string]ASTValue{
 					"name": {
 						token: name,
 					},
@@ -123,11 +123,11 @@ func (self *Parser) HandleArgList() *ASTNode {
 		}
 		
 		args = append(args, &ASTNode{
-			nodetype: NodeNamedArgumentDef,
-			body: []*ASTNode{
+			Nodetype: NodeNamedArgumentDef,
+			Body: []*ASTNode{
 				expr,
 			},
-			values: map[string]ASTValue{
+			Values: map[string]ASTValue{
 				"name": {
 					token: name,
 				},
@@ -151,8 +151,8 @@ func (self *Parser) HandleArgList() *ASTNode {
 	self.Consume()
 
 	return &ASTNode{
-		nodetype: NodeArgumentList,
-		body: args,
+		Nodetype: NodeArgumentList,
+		Body: args,
 	}
 }
 
@@ -166,8 +166,8 @@ func (self *Parser) HandleLambda(t Token) *ASTNode {
 	}
 
 	node := &ASTNode{
-		nodetype: NodeAnonymousFunction,
-		body: []*ASTNode{
+		Nodetype: NodeAnonymousFunction,
+		Body: []*ASTNode{
 			args,
 		},
 	}
@@ -184,8 +184,8 @@ func (self *Parser) HandleFunction(t Token) *ASTNode {
 	arglist := self.HandleArgList()
 
 	node := &ASTNode{
-		nodetype: NodeFunction,
-		body: []*ASTNode{
+		Nodetype: NodeFunction,
+		Body: []*ASTNode{
 			&ident,
 			arglist,
 		},
@@ -199,7 +199,7 @@ func (self *Parser) HandleFunction(t Token) *ASTNode {
 }
 
 func (self *Parser) HandleReturn(t Token) *ASTNode {
-	body := []*ASTNode{}
+	Body := []*ASTNode{}
 
 	for {
 		expr := self.GetExpression()
@@ -208,7 +208,7 @@ func (self *Parser) HandleReturn(t Token) *ASTNode {
 			break
 		}
 
-		body = append(body, expr)
+		Body = append(Body, expr)
 
 		if self.Peek().token == TokenComma {
 			self.Consume()
@@ -219,15 +219,15 @@ func (self *Parser) HandleReturn(t Token) *ASTNode {
 	}
 
 	return &ASTNode{
-		nodetype: NodeReturn,
-		body: body,
+		Nodetype: NodeReturn,
+		Body: Body,
 	}
 }
 
 func (self *Parser) HandleDo(t Token) *ASTNode {
 	node := &ASTNode{
-		nodetype: NodeArbitraryScope,
-		body: []*ASTNode{},
+		Nodetype: NodeArbitraryScope,
+		Body: []*ASTNode{},
 	}
 
 	self.ast.OpenScope(node)
@@ -241,8 +241,8 @@ func (self *Parser) HandleIf(t Token) *ASTNode {
 	expr := self.ExpectExpression(self.Peek())
 
 	ifnode := &ASTNode{
-		nodetype: NodeIf,
-		body: []*ASTNode{
+		Nodetype: NodeIf,
+		Body: []*ASTNode{
 			expr,
 		},
 	}
@@ -253,8 +253,8 @@ func (self *Parser) HandleIf(t Token) *ASTNode {
 
 	haselse := false
 	scopenode := &ASTNode{
-		nodetype: NodeIfScope,
-		body: []*ASTNode{},
+		Nodetype: NodeIfScope,
+		Body: []*ASTNode{},
 	}
 
 	self.ast.OpenScope(scopenode)
@@ -263,7 +263,7 @@ func (self *Parser) HandleIf(t Token) *ASTNode {
 		br, last := self.HandleParsing()
 		
 		if last == KeywordEnd || last == KeywordElse || last == KeywordElseif {
-			ifnode.body = append(ifnode.body, self.ast.CloseScope())
+			ifnode.Body = append(ifnode.Body, self.ast.CloseScope())
 		}
 
 		if last == KeywordEnd {
@@ -282,8 +282,8 @@ func (self *Parser) HandleIf(t Token) *ASTNode {
 			haselse = true
 
 			elsenode := &ASTNode{
-				nodetype: NodeElseScope,
-				body: []*ASTNode{},
+				Nodetype: NodeElseScope,
+				Body: []*ASTNode{},
 			}
 
 			self.ast.OpenScope(elsenode)
@@ -295,8 +295,8 @@ func (self *Parser) HandleIf(t Token) *ASTNode {
 			}
 
 			elseifnode := &ASTNode{
-				nodetype: NodeElseIfScope,
-				body: []*ASTNode{
+				Nodetype: NodeElseIfScope,
+				Body: []*ASTNode{
 					expr,
 				},
 			}
@@ -323,21 +323,21 @@ func (self *Parser) HandleFor(t Token) *ASTNode {
 	}
 
 	node := &ASTNode{
-		nodetype: NodeForIterator,
+		Nodetype: NodeForIterator,
 	}
 
 	args := &ASTNode{
-		nodetype: NodeForIteratorArgs,
-		body: []*ASTNode{},
+		Nodetype: NodeForIteratorArgs,
+		Body: []*ASTNode{},
 	}
 
 	for {
 		ident := self.Peek()
 		
 		if ident.token == TokenIdent {
-			args.body = append(args.body, &ASTNode{
-				nodetype: NodeIdentSegNorm,
-				values: map[string]ASTValue{
+			args.Body = append(args.Body, &ASTNode{
+				Nodetype: NodeIdentSegNorm,
+				Values: map[string]ASTValue{
 					"value": {
 						token: self.Consume(),
 					},
@@ -355,7 +355,7 @@ func (self *Parser) HandleFor(t Token) *ASTNode {
 		}
 	}
 
-	node.body = []*ASTNode{
+	node.Body = []*ASTNode{
 		args,
 	}
 
@@ -366,7 +366,7 @@ func (self *Parser) HandleFor(t Token) *ASTNode {
 
 	expr := self.ExpectExpression(self.Peek())
 	
-	node.body = append(node.body, expr)
+	node.Body = append(node.Body, expr)
 
 	if self.ExpectKeyword(KeywordDo) {
 		self.err.Error(ErrorFatal, ParserErrorExpectedKeyword, "do", self.Peek().value)
@@ -402,8 +402,8 @@ func (self *Parser) HandleForI(t Token) *ASTNode {
 	if comma.token == TokenComma {
 		self.Consume()
 		increxpr = &ASTNode{
-			nodetype: NodeForIIncr,
-			body: []*ASTNode{
+			Nodetype: NodeForIIncr,
+			Body: []*ASTNode{
 				self.ExpectExpression(self.Peek()),
 			},
 		}
@@ -412,13 +412,13 @@ func (self *Parser) HandleForI(t Token) *ASTNode {
 	self.ExpectKeyword(KeywordDo)
 
 	node := &ASTNode{
-		nodetype: NodeForI,
-		body: []*ASTNode{
+		Nodetype: NodeForI,
+		Body: []*ASTNode{
 			identexpr,
 			toexpr,
 		},
 
-		values: map[string]ASTValue{
+		Values: map[string]ASTValue{
 			"identifier":{
 				token: ident,
 			},
@@ -426,7 +426,7 @@ func (self *Parser) HandleForI(t Token) *ASTNode {
 	}
 
 	if increxpr != nil {
-		node.body = append(node.body, increxpr)
+		node.Body = append(node.Body, increxpr)
 	}
 
 	self.ast.OpenScope(node)
@@ -438,12 +438,12 @@ func (self *Parser) HandleForI(t Token) *ASTNode {
 
 func (self *Parser) HandleRepeat(t Token) *ASTNode {
 	node := &ASTNode{
-		nodetype: NodeRepeat,
+		Nodetype: NodeRepeat,
 	}
 
 	scope := &ASTNode{
-		nodetype: NodeArbitraryScope,
-		body: []*ASTNode{},
+		Nodetype: NodeArbitraryScope,
+		Body: []*ASTNode{},
 	}
 
 	self.ast.OpenScope(scope)
@@ -454,7 +454,7 @@ func (self *Parser) HandleRepeat(t Token) *ASTNode {
 
 	expr := self.ExpectExpression(self.Peek())
 
-	node.body = []*ASTNode{
+	node.Body = []*ASTNode{
 		expr,
 		scope,
 	}
@@ -464,8 +464,8 @@ func (self *Parser) HandleRepeat(t Token) *ASTNode {
 
 func (self *Parser) HandleWhile(t Token) *ASTNode {
 	node := &ASTNode{
-		nodetype: NodeWhile,
-		body: []*ASTNode{
+		Nodetype: NodeWhile,
+		Body: []*ASTNode{
 			self.ExpectExpression(self.Peek()),
 		},
 	}
@@ -489,8 +489,8 @@ func (self *Parser) HandleGoto(t Token) *ASTNode {
 	}
 	
 	node := &ASTNode{
-		nodetype: NodeGoto,
-		values: map[string]ASTValue{
+		Nodetype: NodeGoto,
+		Values: map[string]ASTValue{
 			"label": {
 				token: *ident,
 			},

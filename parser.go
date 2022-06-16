@@ -103,7 +103,7 @@ func (self *Parser) Consume() Token {
 
 // Pop last block expression
 func (self *Parser) EndPop() {
-	if self.ast.curnode == self.ast.root {
+	if self.ast.CurNode == self.ast.RootNode {
 		self.err.Error(ErrorFatal, ParserErrorUnexpectedEnd)
 		return
 	}
@@ -142,12 +142,12 @@ func (self *Parser) HandleKeyword(t Token) (bool, *ASTNode) {
 
 	case KeywordBreak:
 		return false, &ASTNode{
-			nodetype: NodeBreak,
+			Nodetype: NodeBreak,
 		}
 
 	case KeywordContinue:
 		return false, &ASTNode{
-			nodetype: NodeContinue,
+			Nodetype: NodeContinue,
 		}
 
 	case KeywordWhile:

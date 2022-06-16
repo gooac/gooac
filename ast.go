@@ -6,18 +6,18 @@ import (
 )
 
 type AST struct {
-	root    *ASTNode
-	curnode *ASTNode
+	RootNode    *ASTNode
+	CurNode *ASTNode
+	LastNode    *ASTNode
 	err     ErrorHandler
-	last    *ASTNode
 }
 
 type ASTNode struct {
-	nodetype NodeType
-	body     []*ASTNode
+	Nodetype NodeType
+	Body     []*ASTNode
 
-	values map[string]ASTValue
-	parent *ASTNode
+	Values map[string]ASTValue
+	Parent *ASTNode
 }
 
 type ASTValue struct {
@@ -27,56 +27,56 @@ type ASTValue struct {
 
 func CreateAST(err ErrorHandler) *AST {
 	ast := &AST{
-		root: &ASTNode{
-			nodetype: NodeProgram,
-			body:     []*ASTNode{},
-			values:   map[string]ASTValue{},
+		RootNode: &ASTNode{
+			Nodetype: NodeProgram,
+			Body:     []*ASTNode{},
+			Values:   map[string]ASTValue{},
 		},
 	}
 
-	ast.curnode = ast.root
+	ast.CurNode = ast.RootNode
 	ast.err = err
 
 	return ast
 }
 
 func (self *AST) OpenScope(n *ASTNode) {
-	n.parent = self.curnode
-	self.curnode = n
+	n.Parent = self.CurNode
+	self.CurNode = n
 }
 
 func (self *AST) CloseScope() *ASTNode {
-	if self.curnode == self.root {
-		self.err.Error(ErrorFatal, "Attemping to pop root node!")
+	if self.CurNode == self.RootNode {
+		self.err.Error(ErrorFatal, "Attemping to pop RootNode node!")
 		return nil
 	}
 
-	old := self.curnode
-	self.curnode = self.curnode.parent
+	old := self.CurNode
+	self.CurNode = self.CurNode.Parent
 	
 	return old
 }
 
 func (self *AST) Add(n *ASTNode) {
-	n.parent = self.curnode
+	n.Parent = self.CurNode
 
-	self.last = n
-	self.curnode.body = append(self.curnode.body, n)
+	self.LastNode = n
+	self.CurNode.Body = append(self.CurNode.Body, n)
 }
 
 func (self *ASTNode) Dump(lvl int) {
-	fmt.Printf("%v┌%v", strings.Repeat("│", lvl), string(self.nodetype))
+	fmt.Printf("%v┌%v", strings.Repeat("│", lvl), string(self.Nodetype))
 
 	println()
 
-	if self.values != nil {
+	if self.Values != nil {
 		ind := strings.Repeat("│", lvl)
 		cnt := 0
-		for k, v := range self.values {
+		for k, v := range self.Values {
 			cnt++
 
 			ch := "├"
-			if (cnt == len(self.values)) && len(self.body) == 0 {
+			if (cnt == len(self.Values)) && len(self.Body) == 0 {
 				ch = "└"
 			}
 			
@@ -85,7 +85,7 @@ func (self *ASTNode) Dump(lvl int) {
 		}
 	}
 
-	for _, v := range self.body {
+	for _, v := range self.Body {
 		if v == nil {
 			println("ATTEMPING TO READ NIL ", v)
 			continue
@@ -96,7 +96,7 @@ func (self *ASTNode) Dump(lvl int) {
 
 // DEBUG: Print everything in the AST structure recusively
 func (self *AST) Dump() {
-	self.root.Dump(0)
+	self.RootNode.Dump(0)
 }
 
 // DEBUG: Format and print the ASTValue

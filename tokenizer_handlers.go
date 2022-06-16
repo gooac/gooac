@@ -24,15 +24,15 @@ func (self *Tokenizer) HandleEqSeq(offset int) int {
 // Aka, >= becoming 'geq' instead of 'gt' and 'eq' 
 func (self *Tokenizer) HandleAbsorb(ch byte, next byte, tokch TokenType, toknext TokenType) {
 	tok := &Token{
-		token: tokch,
-		value: string(ch),
-		position: self.position.Copy(),
-		endpos: self.position.Copy(),
-		wspace: self.wspace,
+		Token: tokch,
+		Value: string(ch),
+		Position: self.position.Copy(),
+		EndPos: self.position.Copy(),
+		WhiteSpace: self.WhiteSpace,
 	}
 	defer self.Append(tok)
 
-	self.wspace = 0
+	self.WhiteSpace = 0
 
 	err, p := self.Peek()
 
@@ -45,9 +45,9 @@ func (self *Tokenizer) HandleAbsorb(ch byte, next byte, tokch TokenType, toknext
 	}
 
 	self.Consume()
-	tok.token = toknext
-	tok.value += string(next)
-	tok.endpos = self.position.Copy()
+	tok.Token = toknext
+	tok.Value += string(next)
+	tok.EndPos = self.position.Copy()
 }
 
 // Internal: Handle Number Literals
@@ -126,11 +126,11 @@ func (self *Tokenizer) HandleNumber(ch byte, ws int) (TokenizationError, Token) 
 	}
 
 	tok := Token{
-		token:		token,
-		value: 		num,
-		position: 	spos,
-		endpos: 	self.position.Copy(),
-		wspace: 	ws,
+		Token:		token,
+		Value: 		num,
+		Position: 	spos,
+		EndPos: 	self.position.Copy(),
+		WhiteSpace: 	ws,
 	}
 
 	return realerr, tok
@@ -196,27 +196,27 @@ func (self *Tokenizer) HandleIdentifier(ch byte, ws int) {
 	}
 
 	tok := Token{
-		token:		TokenIdent,
-		value: 		id,
-		position: 	spos,
-		endpos: 	self.position.Copy(),
-		wspace: 	ws,
+		Token:		TokenIdent,
+		Value: 		id,
+		Position: 	spos,
+		EndPos: 	self.position.Copy(),
+		WhiteSpace: 	ws,
 	}
 
-	kwtype, valid := keywordTypes[id]
+	Keyword, valid := keywordTypes[id]
 
 	if valid {
-		tok.token = TokenKeyword
-		tok.kwtype = kwtype
+		tok.Token = TokenKeyword
+		tok.Keyword = Keyword
 	}
 
-	switch kwtype {
-	case KeywordAnd: 	tok.token = TokenAnd
-	case KeywordOr: 	tok.token = TokenOr
-	case KeywordTrue:	tok.token = TokenTrue
-	case KeywordFalse:	tok.token = TokenFalse
-	case KeywordNil:	tok.token = TokenNil
-	case KeywordNot:	tok.token = TokenNot
+	switch Keyword {
+	case KeywordAnd: 	tok.Token = TokenAnd
+	case KeywordOr: 	tok.Token = TokenOr
+	case KeywordTrue:	tok.Token = TokenTrue
+	case KeywordFalse:	tok.Token = TokenFalse
+	case KeywordNil:	tok.Token = TokenNil
+	case KeywordNot:	tok.Token = TokenNot
 	}
 
 	self.Append(&tok)
@@ -260,12 +260,12 @@ func (self *Tokenizer) HandleString(starter byte, ws int) (TokenizationError, by
 	}
 
 	self.Append(&Token{
-		token:		TokenString,
-		value: 		str,
-		position: 	spos,
-		endpos: 	self.position.Copy(),
-		wspace: 	ws,
-		special: 	string(starter),
+		Token:		TokenString,
+		Value: 		str,
+		Position: 	spos,
+		EndPos: 	self.position.Copy(),
+		WhiteSpace: 	ws,
+		Special: 	string(starter),
 	})
 
 	// This allows consumation of the entire string before
@@ -284,10 +284,10 @@ func (self *Tokenizer) HandleMultilineString(ch byte, ws int) (TokenizationError
 
 	if (ierr != nil) || (ipeek != '[' && ipeek != '=') {
 		self.Append(&Token{
-			token: TokenLBrac,
-			value: string(ch),
-			position: start,
-			endpos: start,
+			Token: TokenLBrac,
+			Value: string(ch),
+			Position: start,
+			EndPos: start,
 		})
 
 		return TokErrNone, 0
@@ -337,11 +337,11 @@ func (self *Tokenizer) HandleMultilineString(ch byte, ws int) (TokenizationError
 	}
 
 	self.Append(&Token{
-		token: TokenMLString,
-		value: string(str),
-		position: start,
-		endpos: self.position.Copy(),
-		special: strings.Repeat("=", amt),
+		Token: TokenMLString,
+		Value: string(str),
+		Position: start,
+		EndPos: self.position.Copy(),
+		Special: strings.Repeat("=", amt),
 	})
 
 	return TokErrNone, 0
@@ -351,10 +351,10 @@ func (self *Tokenizer) HandleMultilineString(ch byte, ws int) (TokenizationError
 func (self *Tokenizer) HandleVariadics(pd byte, ws int) {
 	pos := self.position.Copy()
 	tok := &Token{
-		token: TokenPeriod,
-		value: ".",
-		position: pos,
-		endpos: pos,
+		Token: TokenPeriod,
+		Value: ".",
+		Position: pos,
+		EndPos: pos,
 	}
 	defer self.Append(tok)
 
@@ -368,9 +368,9 @@ func (self *Tokenizer) HandleVariadics(pd byte, ws int) {
 	}
 
 	self.Consume()
-	tok.token = TokenConcat
-	tok.value = ".."
-	tok.endpos = self.position.Copy()
+	tok.Token = TokenConcat
+	tok.Value = ".."
+	tok.EndPos = self.position.Copy()
 
 	err, p = self.Peek()
 	if err != nil {
@@ -382,9 +382,9 @@ func (self *Tokenizer) HandleVariadics(pd byte, ws int) {
 	}
 	
 	self.Consume()
-	tok.token = TokenVariadic
-	tok.value = "..."
-	tok.endpos = self.position.Copy()
+	tok.Token = TokenVariadic
+	tok.Value = "..."
+	tok.EndPos = self.position.Copy()
 }
 
 // Internal: Handle Regular Comments
@@ -395,18 +395,18 @@ func (self *Tokenizer) HandleComment(ch byte, ws int) {
 	if nextp == '>' {
 		self.Consume()
 		self.Append(&Token{
-			token: TokenColon,
-			value: string(ch) + ">",
-			position: start,
-			endpos: self.position.Copy(),
+			Token: TokenColon,
+			Value: string(ch) + ">",
+			Position: start,
+			EndPos: self.position.Copy(),
 		})
 		return
 	} else if (nexterr != nil) || nextp != '-' {
 		self.Append(&Token{
-			token: TokenSub,
-			value: string(ch),
-			position: start,
-			endpos: start,
+			Token: TokenSub,
+			Value: string(ch),
+			Position: start,
+			EndPos: start,
 		})
 
 		return
@@ -439,10 +439,10 @@ func (self *Tokenizer) HandleComment(ch byte, ws int) {
 	}
 
 	self.Append(&Token{
-		token: TokenComment,
-		value: cmt,
-		position: start,
-		endpos: self.position.Copy(),
+		Token: TokenComment,
+		Value: cmt,
+		Position: start,
+		EndPos: self.position.Copy(),
 	})
 }
 
@@ -453,10 +453,10 @@ func (self *Tokenizer) HandleCStyleComment(ch byte, ws int) {
 
 	if (nexterr != nil) || (nextp != '/' && nextp != '*') {
 		self.Append(&Token{
-			token: TokenDiv,
-			value: string(ch),
-			position: start,
-			endpos: start,
+			Token: TokenDiv,
+			Value: string(ch),
+			Position: start,
+			EndPos: start,
 		})
 
 		return
@@ -502,10 +502,10 @@ func (self *Tokenizer) HandleCStyleComment(ch byte, ws int) {
 	}
 
 	self.Append(&Token{
-		token: TokenComment,
-		value: cmt,
-		position: start,
-		endpos: self.position.Copy(),
+		Token: TokenComment,
+		Value: cmt,
+		Position: start,
+		EndPos: self.position.Copy(),
 	})
 }
 
@@ -540,10 +540,10 @@ func (self *Tokenizer) HandleMultilineComment(start *Position, eqamt int) {
 	}
 
 	self.Append(&Token{
-		token: TokenComment,
-		value: cmt,
-		position: *start,
-		endpos: self.position.Copy(),
+		Token: TokenComment,
+		Value: cmt,
+		Position: *start,
+		EndPos: self.position.Copy(),
 	})
 }
 
@@ -553,10 +553,10 @@ func (self *Tokenizer) HandleSymbol(sym byte) TokenizationError {
 
 	if valid {
 		self.Append(&Token{
-			token: val,
-			value: string(sym),
-			position: self.position.Copy(),
-			endpos: self.position.Copy(),
+			Token: val,
+			Value: string(sym),
+			Position: self.position.Copy(),
+			EndPos: self.position.Copy(),
 		})
 		return TokErrNone
 	}

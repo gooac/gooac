@@ -21,8 +21,8 @@ type ASTNode struct {
 }
 
 type ASTValue struct {
-	token 		Token
-	tokens 		[]Token
+	Token 		Token
+	Tokens 		[]Token
 }
 
 func CreateAST(err ErrorHandler) *AST {
@@ -103,13 +103,13 @@ func (self *AST) Dump() {
 func (self *ASTValue) Print() {
 	defer fmt.Printf(">\n")
 	
-	if self.tokens != nil {
+	if self.Tokens != nil {
 		fmt.Printf("<ASTValue(tokens): ")
 
-		for k, v := range self.tokens {
+		for k, v := range self.Tokens {
 			v.Print()
 			
-			if k != len(self.tokens) - 1 {
+			if k != len(self.Tokens) - 1 {
 				fmt.Printf(", ")
 			}
 		}
@@ -117,5 +117,5 @@ func (self *ASTValue) Print() {
 	}
 
 	fmt.Printf("<ASTValue: ")
-	self.token.Print()
+	self.Token.Print()
 }

@@ -17,17 +17,17 @@ func (self *Parser) HandleIdentStub() *ASTNode {
 		Nodetype: NodeIdentSegNorm,
 		Values: map[string]ASTValue{
 			"value": {
-				token: ident,
+				Token: ident,
 			},
 		},
 	}
 
-	if ident.token != TokenIdent {
-		self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, ident.value)
+	if ident.Token != TokenIdent {
+		self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, ident.Value)
 		return expr
 	}
 
-	if sym.token == TokenColon {
+	if sym.Token == TokenColon {
 		expr.Nodetype = NodeIdentSegColon
 	}
 
@@ -48,8 +48,8 @@ func (self *Parser) QualifyIdent() ASTNode {
 
 	initial := self.Consume()
 
-	if initial.token != TokenIdent {
-		self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, initial.value)
+	if initial.Token != TokenIdent {
+		self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, initial.Value)
 		return node
 	}
 
@@ -57,7 +57,7 @@ func (self *Parser) QualifyIdent() ASTNode {
 		{Nodetype: NodeIdentSegNorm,
 			Values: map[string]ASTValue{
 				"value": {
-					token: initial,
+					Token: initial,
 				},
 			},
 		},
@@ -76,7 +76,7 @@ func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 	for {
 		sym := self.Peek()
 
-		if sym.token == TokenLBrac {
+		if sym.Token == TokenLBrac {
 			self.Consume()
 			expr := self.ExpectExpression(self.Peek())
 
@@ -87,8 +87,8 @@ func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 			node.Body = append(node.Body, expr)
 
 			rbrac := self.Consume()
-			if rbrac.token != TokenRBrac {
-				self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "]", rbrac.value)
+			if rbrac.Token != TokenRBrac {
+				self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "]", rbrac.Value)
 			}
 
 			if iscolon && !errored {
@@ -97,7 +97,7 @@ func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 			}
 
 			continue
-		} else if (sym.token != TokenPeriod) && (sym.token != TokenColon) {
+		} else if (sym.Token != TokenPeriod) && (sym.Token != TokenColon) {
 			break
 		}
 
@@ -106,7 +106,7 @@ func (self *Parser) HandleIndexing(node *ASTNode) *ASTNode {
 			self.err.Error(ErrorFatal, ParserErrorAssigningToMethod, "Did you put a colon before subscripting?")
 		}
 
-		if sym.token == TokenColon {
+		if sym.Token == TokenColon {
 			if iscolon && !errored {
 				errored = true
 				self.err.Error(ErrorFatal, ParserErrorAssigningToMethod, "Do you have 2 colons?")
@@ -155,7 +155,7 @@ var Priorities = map[TokenType]struct {
 func (self *Parser) HandleBinExpr(lhs_ast *ASTNode) *ASTNode {
 	p := self.Peek()
 
-	prio, is := Priorities[p.token]
+	prio, is := Priorities[p.Token]
 
 	if !is {
 		return lhs_ast
@@ -179,7 +179,7 @@ func (self *Parser) HandleBinExpr(lhs_ast *ASTNode) *ASTNode {
 	// supposed to indicate :) i know im a dumdum
 	// just... verify this later it isnt important now
 	if (lhs_ast.Nodetype == NodeBinaryExpression) &&
-		(Priorities[lhs_ast.Values["operator"].token.token].left > prio.left) {
+		(Priorities[lhs_ast.Values["operator"].Token.Token].left > prio.left) {
 
 		Body[0] = rhs_ast
 		Body[1] = lhs_ast
@@ -190,7 +190,7 @@ func (self *Parser) HandleBinExpr(lhs_ast *ASTNode) *ASTNode {
 		Body:     Body,
 		Values: map[string]ASTValue{
 			"operator": {
-				token: p,
+				Token: p,
 			},
 		},
 	}
@@ -206,16 +206,16 @@ func (self *Parser) HandleBinExprLiteral(lit Token) *ASTNode {
 		self.Consume(),
 	}
 
-	if IsNumberLiteralType(lit.token) && (self.Peek().token == TokenPeriod) {
+	if IsNumberLiteralType(lit.Token) && (self.Peek().Token == TokenPeriod) {
 		prd := self.Consume()
 
 		next := self.Peek()
 
-		if IsNumberLiteralType(next.token) {
+		if IsNumberLiteralType(next.Token) {
 			self.Consume()
 			toks = append(toks, prd)
 			toks = append(toks, next)
-		} else if next.token == TokenHexNumber {
+		} else if next.Token == TokenHexNumber {
 			self.Consume()
 			self.err.Error(ErrorFatal, ParserErrorNumberUnexpectedHexNum)
 			toks = append(toks, next)
@@ -228,7 +228,7 @@ func (self *Parser) HandleBinExprLiteral(lit Token) *ASTNode {
 		Nodetype: NodeLiteral,
 		Values: map[string]ASTValue{
 			"value": {
-				tokens: toks,
+				Tokens: toks,
 			},
 		},
 	})
@@ -252,7 +252,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 	for {
 		p := self.Peek()
 
-		switch p.token {
+		switch p.Token {
 		case TokenLParen:
 			self.Consume()
 
@@ -285,7 +285,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 						Nodetype: NodeLiteral,
 						Values: map[string]ASTValue{
 							"value": {
-								tokens: []Token{
+								Tokens: []Token{
 									self.Consume(),
 								},
 							},
@@ -310,8 +310,8 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 
 		id := self.Peek()
 
-		if id.token != TokenIdent {
-			self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, id.value)
+		if id.Token != TokenIdent {
+			self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, id.Value)
 			break
 		}
 
@@ -319,7 +319,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 			Nodetype: NodeMemberMeth,
 			Values: map[string]ASTValue{
 				"ident":{
-					token: self.Consume(),
+					Token: self.Consume(),
 				},
 			},
 			Body: []*ASTNode{
@@ -329,8 +329,8 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 
 		paren := self.Consume()
 		
-		if paren.token != TokenLParen {
-			self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "(", paren.value)
+		if paren.Token != TokenLParen {
+			self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "(", paren.Value)
 			break
 		}
 
@@ -353,8 +353,8 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 
 			id := self.Peek()
 
-			if id.token != TokenIdent {
-				self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, id.value)
+			if id.Token != TokenIdent {
+				self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, id.Value)
 				break
 			}
 
@@ -362,7 +362,7 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 				Nodetype: NodeMemberIdent,
 				Values: map[string]ASTValue{
 					"ident": {
-						token: self.Consume(),
+						Token: self.Consume(),
 					},
 				},
 				Body: []*ASTNode{
@@ -377,14 +377,14 @@ func (self *Parser) HandleTrails(n *ASTNode) *ASTNode {
 			expr := self.ExpectExpression(pp)
 
 			if expr == nil {
-				self.err.Error(ErrorFatal, ParserErrorExpectedExpression, pp.token)
+				self.err.Error(ErrorFatal, ParserErrorExpectedExpression, pp.Token)
 				break
 			}
 
 			pp = self.Consume()
 
-			if pp.token != TokenRBrac {
-				self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "]", pp.value)
+			if pp.Token != TokenRBrac {
+				self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "]", pp.Value)
 				break
 			}
 

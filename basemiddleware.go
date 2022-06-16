@@ -21,7 +21,7 @@ func AttributeMiddleware() attributeMiddleware {
 		prs := i[0].(*Parser)
 		tok := i[1].(Token)
 
-		if tok.token == TokenAttr && prs.PeekSome(1).token == TokenLBrac {
+		if tok.Token == TokenAttr && prs.PeekSome(1).Token == TokenLBrac {
 			prs.Consume()
 			prs.Consume()
 			m.Handle(prs)
@@ -50,7 +50,7 @@ func (mw *attributeMiddleware) Handle(self *Parser) {
 
 		nodes = append(nodes, expr)
 	
-		if self.Peek().token == TokenComma {
+		if self.Peek().Token == TokenComma {
 			self.Consume()
 			continue
 		} else {
@@ -59,8 +59,8 @@ func (mw *attributeMiddleware) Handle(self *Parser) {
 	}
 
 	t := self.Consume()
-	if t.token != TokenRBrac {
-		self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "]", t.value)
+	if t.Token != TokenRBrac {
+		self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, "]", t.Value)
 		return
 	}
 
@@ -77,15 +77,15 @@ func (mw *attributeMiddleware) Handle(self *Parser) {
 	n := self.Peek()
 	var fn *ASTNode
 
-	if n.token != TokenKeyword {
-		self.err.Error(ErrorFatal, AttributeMiddlewareMustBeFn, n.value)
+	if n.Token != TokenKeyword {
+		self.err.Error(ErrorFatal, AttributeMiddlewareMustBeFn, n.Value)
 		return
 	}
 
-	if n.kwtype == KeywordFunction {
+	if n.Keyword == KeywordFunction {
 		self.Consume()
 		fn = self.HandleFunction(n)
-	} else if n.kwtype == KeywordLocal {
+	} else if n.Keyword == KeywordLocal {
 		self.Consume()
 		self.Consume()
 		fn = self.HandleFunction(n)

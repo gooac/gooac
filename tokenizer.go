@@ -13,7 +13,7 @@ type Tokenizer struct {
 	index 		int						// Current index being read of tokenization string 
 	position 	*Position				// Position the tokenizers at
 	err 		ErrorHandler			// ErrorHandler to be used to output errors and warn messages.
-	wspace 		int 					// Current whitespace
+	WhiteSpace 		int 					// Current whitespace
 	regex 		*regexp.Regexp  		// Shebang Stripper
 	last 		*Token					// Last token to be appended
 	middleware 	*MiddlewareHandler	 	// All instantiated middleware for the tokenizer
@@ -26,7 +26,7 @@ func (self *Tokenizer) Reset() {
 	self.index 		= 0
 	self.position 	= nil
 	self.err 		= nil
-	self.wspace 	= 0
+	self.WhiteSpace 	= 0
 }
 
 // Tokenizes given byte slice into Tokens
@@ -41,7 +41,7 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 	self.tokens 	= []Token{}
 	self.index 		= 0
 	self.position	= &Position{1, 0, &self.index}
-	self.wspace 	= 0
+	self.WhiteSpace 	= 0
 
 	if e == nil {
 		self.err = &BaseErrorHandler{}
@@ -57,10 +57,10 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 
 		if conserr != nil {
 			self.Append(&Token{
-				token: TokenEOF,
-				value: "<EOF>",
-				position: self.position.Copy(),
-				endpos: self.position.Copy(),
+				Token: TokenEOF,
+				Value: "<EOF>",
+				Position: self.position.Copy(),
+				EndPos: self.position.Copy(),
 			})
 
 			break
@@ -73,32 +73,32 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 		// Ignore newlines
 		if b == '\n' {
 			if self.last != nil {
-				self.last.newline++
+				self.last.Newlines++
 			}
 			continue
 		} else if b == '\r' {
 			continue
 		// Whitespace Incrementor
 		} else if IsWhitespace(b) {
-			self.wspace++
+			self.WhiteSpace++
 			continue
 		
 		// Check if byte is numeric and run number handler
 		} else if IsNumeric(b) {
-			err, tok := self.HandleNumber(b, self.wspace)
-			self.wspace = 0
+			err, tok := self.HandleNumber(b, self.WhiteSpace)
+			self.WhiteSpace = 0
 
 			self.Append(&tok)
 
 			if err != TokErrNone {
-				self.err.Error(ErrorGeneral, string(err), tok.value)
+				self.err.Error(ErrorGeneral, string(err), tok.Value)
 			}
 			continue
 		
 		// Check if byte is a valid identifier starter, if so run ident handler
 		} else if IsAlpha(b) || b == '_' {
-			self.HandleIdentifier(b, self.wspace)
-			self.wspace = 0
+			self.HandleIdentifier(b, self.WhiteSpace)
+			self.WhiteSpace = 0
 
 			continue
 		}
@@ -106,13 +106,13 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 		switch b {
 		// String handlers
 		case '\'', '"': 
-			err, starter := self.HandleString(b, self.wspace)
+			err, starter := self.HandleString(b, self.WhiteSpace)
 
 			if err != TokErrNone {
 				self.err.Error(ErrorFatal, string(err), string(starter))
 			}
 		case '[': 
-			err, cnt := self.HandleMultilineString(b, self.wspace)
+			err, cnt := self.HandleMultilineString(b, self.WhiteSpace)
 
 			if err != TokErrNone {
 				self.err.Error(ErrorFatal, string(err), "]" + strings.Repeat("=", cnt) + "]")
@@ -120,12 +120,12 @@ func (self *Tokenizer) Tokenize(str []byte, e *ErrorHandler) ([]Token, bool) {
 		
 		// Comment Handlers
 		case '-':
-			self.HandleComment(b, self.wspace)
+			self.HandleComment(b, self.WhiteSpace)
 		case '/':
-			self.HandleCStyleComment(b, self.wspace)
+			self.HandleCStyleComment(b, self.WhiteSpace)
 
 		// Variadic and Concatenation Handling
-		case '.': self.HandleVariadics(b, self.wspace)
+		case '.': self.HandleVariadics(b, self.WhiteSpace)
 		
 		// Absorptions
 		case '>': self.HandleAbsorb(b, '=', TokenGt, TokenGtEq)

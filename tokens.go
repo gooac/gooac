@@ -239,44 +239,44 @@ var keywordTypeValues = map[KeywordType]string {
 
 // Token Struct
 type Token struct {
-	token 		TokenType				// What type of token it is
-	value 		string					// Actual value of the token
-	invalid 	bool 					// Is the token a valid token at all?
+	Token 		TokenType				// What type of token it is
+	Value 		string					// Actual value of the token
+	Invalid 	bool 					// Is the token a valid token at all?
 	
-	position	Position				// Copy of tokenizers starting positional data
-	endpos		Position				// Copy of tokenizers ending position
+	Position	Position				// Copy of tokenizers starting positional data
+	EndPos		Position				// Copy of tokenizers ending position
 	
-	wspace		int						// Whitespace preceding token
-	newline 	int 					// Newlines after token
+	WhiteSpace	int						// Whitespace preceding token
+	Newlines 	int 					// Newlines after token
 
-	kwtype 		KeywordType				// Type of keyword if a keyword at all	
+	Keyword 	KeywordType				// Type of keyword if a keyword at all	
 
-	special 	string					// Special value for strings
+	Special 	string					// Special value for strings
 }
 
 func (self *Token) ToASTValue() ASTValue {
 	return ASTValue{
-		token: *self,
+		Token: *self,
 	}
 }
 
 func (self *Token) Print() {
-	// fmt.Printf("tok(%v: ", tokenNames[self.token])
+	// fmt.Printf("tok(%v: ", tokenNames[self.Token])
 	// print("[")
-	// for k, v := range []byte(self.value) {
+	// for k, v := range []byte(self.Value) {
 	// 	print(v)
 		
-	// 	if k != len(self.value) - 1 {
+	// 	if k != len(self.Value) - 1 {
 	// 		print(", ")
 	// 	}
 	// }
 	// print("] = ")
 
-	fmt.Printf("<Token|%s-%s| is '%s' = \"%s\">", self.position.Fancy(), self.endpos.Fancy(), tokenNames[self.token], self.value)
+	fmt.Printf("<Token|%s-%s| is '%s' = \"%s\">", self.Position.Fancy(), self.EndPos.Fancy(), tokenNames[self.Token], self.Value)
 }
 
 func (self *Token) Is(t Token) bool {
-	return self.invalid == t.invalid &&
-	self.token == t.token &&
-	self.value == t.value 
+	return self.Invalid == t.Invalid &&
+	self.Token == t.Token &&
+	self.Value == t.Value 
 }

@@ -6,21 +6,21 @@ import "fmt"
 func (self *Compiler) CompileLiteral(n *ASTNode) string {
 	s := ""
 
-	first := n.Values["value"].tokens[0]
+	first := n.Values["value"].Tokens[0]
 
-	if first.token == TokenString {
-		s += first.special + first.value + first.special
-	} else if first.token == TokenMLString {
-		s += "[" + first.special + "[" + 
-		first.value + 
-		"]" + first.special + "]"
+	if first.Token == TokenString {
+		s += first.Special + first.Value + first.Special
+	} else if first.Token == TokenMLString {
+		s += "[" + first.Special + "[" + 
+		first.Value + 
+		"]" + first.Special + "]"
 	} else {
-		for k, v := range n.Values["value"].tokens {
-			if k != 0 && v.token == TokenHexNumber {
-				self.err.Error(ErrorGeneral, CompilerErrUnexpectedHex, v.value, s)
+		for k, v := range n.Values["value"].Tokens {
+			if k != 0 && v.Token == TokenHexNumber {
+				self.err.Error(ErrorGeneral, CompilerErrUnexpectedHex, v.Value, s)
 			}
 			
-			s += v.value
+			s += v.Value
 		}
 	}
 
@@ -35,9 +35,9 @@ func (self *Compiler) CompileIdentifier(n *ASTNode) string {
 				s += "."
 			}
 			
-			s += v.Values["value"].token.value
+			s += v.Values["value"].Token.Value
 		} else if v.Nodetype == NodeIdentSegColon {
-			s += ":" + v.Values["value"].token.value
+			s += ":" + v.Values["value"].Token.Value
 		} else {
 			s += "[" + self.CompileNode(v) + "]"
 		}
@@ -219,15 +219,15 @@ func (self *Compiler) CompileLocalAssign(n *ASTNode) string {
 }
 
 func (self *Compiler) CompileLabel(n *ASTNode) string {
-	return "::" + n.Values["label"].token.value + "::"
+	return "::" + n.Values["label"].Token.Value + "::"
 }
 
 func (self *Compiler) CompileGoto(n *ASTNode) string {
-	return "goto " + n.Values["label"].token.value
+	return "goto " + n.Values["label"].Token.Value
 }
 
 func (self *Compiler) CompileBool(n *ASTNode) string {
-	return n.Values["value"].token.value
+	return n.Values["value"].Token.Value
 }
 
 func (self *Compiler) CompileNil(n *ASTNode) string {
@@ -309,18 +309,18 @@ func (self *Compiler) CompileFuncArgs(n *ASTNode) string {
 		}
 		
 		if v.Nodetype == NodeArgumentNormal {
-			s += v.Values["name"].token.value + apnd
+			s += v.Values["name"].Token.Value + apnd
 		} else if v.Nodetype == NodeArgumentVariadic {
 			s += "..." + apnd
 		} else if v.Nodetype == NodeNamedArgumentDef {
-			name := v.Values["name"].token.value
+			name := v.Values["name"].Token.Value
 			s += name + apnd
 
 			post += name + "=" + name + " or " + self.CompileNode(v.Body[0]) + ";"
 		} else if v.Nodetype == NodeNamedArgumentVariadic {
 			s += "..." + apnd
 			
-			post += "local " + v.Values["name"].token.value + "={...};"
+			post += "local " + v.Values["name"].Token.Value + "={...};"
 		}
 	}
 
@@ -351,14 +351,14 @@ func (self *Compiler) CompileFunc(n *ASTNode) string {
 }
 
 func (self *Compiler) CompileBinaryExpr(n *ASTNode) string {
-	return "(" + self.CompileNode(n.Body[0]) + " " + n.Values["operator"].token.value + " "  + self.CompileNode(n.Body[1]) + ")"
+	return "(" + self.CompileNode(n.Body[0]) + " " + n.Values["operator"].Token.Value + " "  + self.CompileNode(n.Body[1]) + ")"
 }
 
 func (self *Compiler) CompileForI(n *ASTNode) string {
 	s := "for "
 	skip := 2
 
-	s += n.Values["identifier"].token.value + "="
+	s += n.Values["identifier"].Token.Value + "="
 
 	s += self.CompileNode(n.Body[0])
 
@@ -388,7 +388,7 @@ func (self *Compiler) CompileForIter(n *ASTNode) string {
 
 	l := len(n.Body[0].Body) - 1
 	for k, v := range n.Body[0].Body {
-		s += v.Values["value"].token.value
+		s += v.Values["value"].Token.Value
 		
 		if k != l {
 			s += ","

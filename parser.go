@@ -1,9 +1,9 @@
 package gooa
 
 var InvalidToken = Token{
-	token: TokenEOF,
-	value: "<EOF>",
-	invalid: true,
+	Token: TokenEOF,
+	Value: "<EOF>",
+	Invalid: true,
 }
 
 // Parser Construct
@@ -59,12 +59,12 @@ func (self *Parser) Peek() Token {
 
 	tok := self.tokens[self.index]
 
-	if tok.token == TokenComment {
+	if tok.Token == TokenComment {
 		self.Consume()
 		return self.Peek()
 	}
 
-	self.err.SetPosition(&tok.position)
+	self.err.SetPosition(&tok.Position)
 
 	return tok
 }
@@ -77,7 +77,7 @@ func (self *Parser) PeekSome(amt int) Token {
 
 	tok := self.tokens[self.index + amt]
 
-	self.err.SetPosition(&tok.position)
+	self.err.SetPosition(&tok.Position)
 
 	return tok
 }
@@ -96,7 +96,7 @@ func (self *Parser) Consume() Token {
 	b := self.tokens[self.index]
 	self.index++
 
-	self.err.SetPosition(&b.position)
+	self.err.SetPosition(&b.Position)
 
 	return b
 }
@@ -114,7 +114,7 @@ func (self *Parser) EndPop() {
 
 // Handle Keyword Tokens
 func (self *Parser) HandleKeyword(t Token) (bool, *ASTNode) {
-	switch t.kwtype {
+	switch t.Keyword {
 	case KeywordLocal:
 		self.HandleLocal(t)
 
@@ -160,7 +160,7 @@ func (self *Parser) HandleKeyword(t Token) (bool, *ASTNode) {
 	case KeywordElse, KeywordElseif, KeywordUntil: return false, nil
 
 	default:
-		self.err.Error(ErrorFatal, ParserErrorUnexpectedKeyword, keywordTypeValues[t.kwtype])
+		self.err.Error(ErrorFatal, ParserErrorUnexpectedKeyword, keywordTypeValues[t.Keyword])
 	}
 
 	return false, nil
@@ -181,16 +181,16 @@ func (self *Parser) HandleParsing() (bool, KeywordType) {
 		return false, KeywordEmpty
 	}
 
-	if curtok.token == TokenEOF {
+	if curtok.Token == TokenEOF {
 		return true, KeywordEmpty
 	}
 
-	if IsLiteralType(curtok.token) {
+	if IsLiteralType(curtok.Token) {
 		self.ast.Add(self.HandleBinExprLiteral(self.Consume()))
 		return false, KeywordEmpty
 	}
 
-	switch curtok.token {
+	switch curtok.Token {
 	case TokenKeyword:
 		_, val := self.HandleKeyword(self.Consume())
 		
@@ -198,7 +198,7 @@ func (self *Parser) HandleParsing() (bool, KeywordType) {
 			self.ast.Add(val)
 		}
 		
-		return false, curtok.kwtype
+		return false, curtok.Keyword
 	case TokenIdent:
 		n := self.HandleIdentifier(curtok)
 
@@ -223,7 +223,7 @@ func (self *Parser) HandleParsing() (bool, KeywordType) {
 		self.HandleComment(self.Consume())
 
 	default:
-		self.err.Error(ErrorFatal, ParserErrorUnexpectedX, tokenNames[curtok.token])
+		self.err.Error(ErrorFatal, ParserErrorUnexpectedX, tokenNames[curtok.Token])
 	}
 
 	return false, KeywordEmpty

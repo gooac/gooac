@@ -4,8 +4,8 @@ package gooa
 func (self *Parser) ExpectKeyword(kw KeywordType) bool {
 	next := self.Consume()
 
-	if next.kwtype != kw {
-		self.err.Error(ErrorFatal, ParserErrorExpectedKeyword, keywordTypeValues[kw], next.value)
+	if next.Keyword != kw {
+		self.err.Error(ErrorFatal, ParserErrorExpectedKeyword, keywordTypeValues[kw], next.Value)
 		return true
 	}
 
@@ -15,8 +15,8 @@ func (self *Parser) ExpectKeyword(kw KeywordType) bool {
 func (self *Parser) ExpectToken(tty TokenType) *Token {
 	next := self.Consume()
 
-	if next.token != tty {
-		self.err.Error(ErrorFatal, ParserErrorExpectedToken, tokenNames[tty], next.value)
+	if next.Token != tty {
+		self.err.Error(ErrorFatal, ParserErrorExpectedToken, tokenNames[tty], next.Value)
 		return &InvalidToken
 	}
 
@@ -24,7 +24,7 @@ func (self *Parser) ExpectToken(tty TokenType) *Token {
 }
 
 func (self *Parser) HandleUntil(kw KeywordType, msg string) {
-	start := self.Peek().position.Copy()
+	start := self.Peek().Position.Copy()
 
 	for {
 		br, last := self.HandleParsing()
@@ -47,7 +47,7 @@ func (self *Parser) HandleUntilEnd(msg string) {
 func (self *Parser) HandleArgList() *ASTNode {
 	lpar := self.Peek()
 
-	if lpar.token != TokenLParen {
+	if lpar.Token != TokenLParen {
 		return &ASTNode{
 			Nodetype: NodeArgumentListOmitted,
 		}
@@ -60,41 +60,41 @@ func (self *Parser) HandleArgList() *ASTNode {
 	for {
 		name := self.Peek()
 
-		if name.token == TokenVariadic {
+		if name.Token == TokenVariadic {
 			self.Consume()
 			args = append(args, &ASTNode{
 				Nodetype: NodeArgumentVariadic,
 			})
 
 			break
-		} else if name.token == TokenRParen {
+		} else if name.Token == TokenRParen {
 			break
-		} else if name.token != TokenIdent {
-			self.err.Error(ErrorFatal, ParserErrorExpectedArgumentName, name.value)
+		} else if name.Token != TokenIdent {
+			self.err.Error(ErrorFatal, ParserErrorExpectedArgumentName, name.Value)
 			break
 		}
 
 		self.Consume()
 
 		p := self.Peek()
-		if p.token == TokenComma || p.token == TokenRParen {
+		if p.Token == TokenComma || p.Token == TokenRParen {
 			args = append(args, &ASTNode{
 				Nodetype: NodeArgumentNormal,
 				Values: map[string]ASTValue{
 					"name": {
-						token: name,
+						Token: name,
 					},
 				},
 			})
 
-			if p.token == TokenRParen {
+			if p.Token == TokenRParen {
 				break
 			}
 
 			self.Consume()
 			continue
-		} else if (p.token != TokenEq) {
-			self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, ",", p.value)
+		} else if (p.Token != TokenEq) {
+			self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, ",", p.Value)
 			break
 		}
 
@@ -102,15 +102,15 @@ func (self *Parser) HandleArgList() *ASTNode {
 		
 		next := self.Peek() 
 
-		if next.token == TokenVariadic {
+		if next.Token == TokenVariadic {
 			args = append(args, &ASTNode{
 				Nodetype: NodeNamedArgumentVariadic,
 				Values: map[string]ASTValue{
 					"name": {
-						token: name,
+						Token: name,
 					},
 					"variadic": {
-						token: self.Consume(),
+						Token: self.Consume(),
 					},
 				},
 			})
@@ -129,14 +129,14 @@ func (self *Parser) HandleArgList() *ASTNode {
 			},
 			Values: map[string]ASTValue{
 				"name": {
-					token: name,
+					Token: name,
 				},
 			},
 		})
 
 		p = self.Peek()
 	
-		if p.token == TokenComma {
+		if p.Token == TokenComma {
 			self.Consume()
 			continue
 		} else {
@@ -144,8 +144,8 @@ func (self *Parser) HandleArgList() *ASTNode {
 		}
 	}
 
-	if self.Peek().token != TokenRParen {
-		self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, ")", self.Peek().value)
+	if self.Peek().Token != TokenRParen {
+		self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, ")", self.Peek().Value)
 	}
 
 	self.Consume()
@@ -210,7 +210,7 @@ func (self *Parser) HandleReturn(t Token) *ASTNode {
 
 		Body = append(Body, expr)
 
-		if self.Peek().token == TokenComma {
+		if self.Peek().Token == TokenComma {
 			self.Consume()
 			continue
 		}
@@ -311,14 +311,14 @@ func (self *Parser) HandleIf(t Token) *ASTNode {
 func (self *Parser) HandleFor(t Token) *ASTNode {
 	next := self.Peek()
 
-	if next.token != TokenIdent {
-		self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, next.value)
+	if next.Token != TokenIdent {
+		self.err.Error(ErrorFatal, ParserErrorExpectedIdentifier, next.Value)
 		return nil
 	}
 
 	nextsome := self.PeekSome(1)
 
-	if nextsome.token == TokenEq {
+	if nextsome.Token == TokenEq {
 		return self.HandleForI(t)
 	}
 
@@ -334,19 +334,19 @@ func (self *Parser) HandleFor(t Token) *ASTNode {
 	for {
 		ident := self.Peek()
 		
-		if ident.token == TokenIdent {
+		if ident.Token == TokenIdent {
 			args.Body = append(args.Body, &ASTNode{
 				Nodetype: NodeIdentSegNorm,
 				Values: map[string]ASTValue{
 					"value": {
-						token: self.Consume(),
+						Token: self.Consume(),
 					},
 				},
 			})
 
 			p := self.Peek()
 
-			if p.token == TokenComma {
+			if p.Token == TokenComma {
 				self.Consume()
 				continue
 			}
@@ -360,7 +360,7 @@ func (self *Parser) HandleFor(t Token) *ASTNode {
 	}
 
 	if self.ExpectKeyword(KeywordIn) {
-		self.err.Error(ErrorFatal, ParserErrorExpectedKeyword, "in", self.Peek().value)
+		self.err.Error(ErrorFatal, ParserErrorExpectedKeyword, "in", self.Peek().Value)
 		return node
 	}
 
@@ -369,7 +369,7 @@ func (self *Parser) HandleFor(t Token) *ASTNode {
 	node.Body = append(node.Body, expr)
 
 	if self.ExpectKeyword(KeywordDo) {
-		self.err.Error(ErrorFatal, ParserErrorExpectedKeyword, "do", self.Peek().value)
+		self.err.Error(ErrorFatal, ParserErrorExpectedKeyword, "do", self.Peek().Value)
 		return node
 	}
 	
@@ -389,8 +389,8 @@ func (self *Parser) HandleForI(t Token) *ASTNode {
 
 	comma := self.Consume()
 
-	if comma.token != TokenComma {
-		self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, ",", comma.value)
+	if comma.Token != TokenComma {
+		self.err.Error(ErrorFatal, ParserErrorExpectedSymbol, ",", comma.Value)
 		return nil
 	}
 	
@@ -399,7 +399,7 @@ func (self *Parser) HandleForI(t Token) *ASTNode {
 	toexpr := self.ExpectExpression(self.Peek())
 	comma = self.Peek()
 
-	if comma.token == TokenComma {
+	if comma.Token == TokenComma {
 		self.Consume()
 		increxpr = &ASTNode{
 			Nodetype: NodeForIIncr,
@@ -420,7 +420,7 @@ func (self *Parser) HandleForI(t Token) *ASTNode {
 
 		Values: map[string]ASTValue{
 			"identifier":{
-				token: ident,
+				Token: ident,
 			},
 		},
 	}
@@ -492,7 +492,7 @@ func (self *Parser) HandleGoto(t Token) *ASTNode {
 		Nodetype: NodeGoto,
 		Values: map[string]ASTValue{
 			"label": {
-				token: *ident,
+				Token: *ident,
 			},
 		},
 	}

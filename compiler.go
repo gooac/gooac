@@ -28,6 +28,7 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 
 	self.err = *err
 	self.ast = ast
+	self.output += "do;"
 
 	self.err.SetErrorRealm(ErrorRealmCompiler)
 
@@ -64,6 +65,8 @@ func (self *Compiler) Compile(ast *AST, err *ErrorHandler) (string, bool) {
 			self.output += ";"
 		}
 	}
+
+	self.output += ";end;"
 
 	self.err.Dump()
 	
